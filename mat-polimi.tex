@@ -1,0 +1,107 @@
+% Copyright (C) 2019 Pasquale Claudio Africa.
+% 
+% This file is part of latex-thesis-mat-polimi.
+% 
+% latex-thesis-mat-polimi is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% latex-thesis-mat-polimi is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with latex-thesis-mat-polimi. If not, see <http://www.gnu.org/licenses/>.
+
+% !TEX root = ./thesis.tex
+
+% Only edit this file if you are aware of what you are doing.
+\documentclass[12pt, a4paper, listof=totoc,
+               headinclude, footinclude, cleardoublepage=empty]{scrbook}
+
+% Generic template options.
+\setcounter{secnumdepth}{3} % Number subsubsections.
+\usepackage{newpxtext} % Main fonts.
+
+\renewcommand*{\contentsname}{Table of contents}
+\renewcommand*{\listfigurename}{List of figures}
+\renewcommand*{\listtablename}{List of tables}
+\renewcommand*{\partpagestyle}{empty} % No numbering on "part" pages.
+
+% Fixes for TOC rendering.
+\usepackage{tocbasic}
+\DeclareTOCStyleEntry[dynnumwidth]{tocline}{figure} % Dynamic label width in list of figures.
+
+
+% Bibliography.
+\usepackage[backend=biber, style=alphabetic, hyperref, backref, maxnames=10, maxcitenames=3, giveninits=true]{biblatex}
+\addbibresource{references.bib}
+
+
+% Standard math packages.
+\usepackage{amsmath, amsthm}
+
+% Math fonts.
+\usepackage{eulerpx}
+
+% Bold math symbols.
+\usepackage{bm}
+\newcommand{\mathbbm}[1]{\text{\usefont{U}{bbm}{m}{n}#1}} % From mathbbm.sty
+
+% Custom theorem environments
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{proposition}{Proposition}[chapter]
+
+ % For braced-style systems of equations.
+\usepackage[overload]{empheq}
+
+
+% Graphics packges.
+% Put your images under the "images/" subdirectory.
+\usepackage{graphicx, grffile}
+\graphicspath{{images/}}
+
+% Numbered and caption subfigures using \subfloat.
+\usepackage{subfig}
+
+% A package for high-quality hand-made figures.
+\usepackage{tikz}
+\usetikzlibrary{}
+
+% Enhances the features of the standard "table" and "tabular" environments.
+\usepackage{tabularx}
+
+
+% Pseudo-code algorithm descriptions.
+\usepackage{algorithm2e}
+
+
+% Cross-references style.
+% Use \cref for generating automatic reference keywords:
+% E.g. can use just "\cref{ch:my_chapter}" instead of
+% "chapter \ref{ch:my_chapter}".
+\usepackage[colorlinks, citecolor=black, linkcolor=black, urlcolor=black, linktoc=all]{hyperref}
+\usepackage{cleveref}
+\usepackage[numbered]{bookmark} % Number PDF bookmarks.
+
+
+% Useful commands.
+\newcommand{\dd}{\,\mathrm{d}}
+\newcommand{\eg}{\textit{e.g.}\ }
+\newcommand{\ie}{\textit{i.e.}\ }
+
+% \abs{x} = |x|
+\newcommand{\abs}[1]{\left|#1\right|}
+% \norm{x} = ||x||
+\newcommand{\norm}[1]{\left\|#1\right\|}
+% Total derivative \tdev{f}{t} = df/dt.
+\newcommand{\tdev}[2]{\frac{\mathrm{d}#1}{\mathrm{d}#2}}
+% Partial derivative \pdev{f}{t}.
+\newcommand{\pdev}[2]{\frac{\partial#1}{\partial#2}}
+
+
+% Set here custom margins.
+\usepackage{geometry}
+\geometry{left=2cm, right=3cm, top=3cm, bottom=4cm}

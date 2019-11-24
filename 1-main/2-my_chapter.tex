@@ -1,0 +1,47 @@
+% !TEX root = ../thesis.tex
+
+\chapter{My chapter}
+\label{ch:chapter_name}
+
+Maxwell's equations read:
+\begin{subequations}
+    \label{eq:maxwell}
+    \begin{align}[left=\empheqlbrace]
+    \nabla\cdot \bm{D} & = \varrho, \label{eq:maxwell1} \\
+    \nabla \times \bm{E} +  \pdev{\bm{B}}{t} &= \bm{0}, \label{eq:maxwell2} \\
+    \nabla\cdot \bm{B} & = 0, \label{eq:maxwell3} \\
+    \nabla \times \bm{H} - \pdev{\bm{D}}{t} &= \bm{J}. \label{eq:maxwell4}
+    \end{align}
+\end{subequations}
+
+\Cref{eq:maxwell} is automatically labeled by \texttt{cleveref}, as well as \cref{eq:maxwell1}, \cref{eq:maxwell3}. Thanks to the \verb|cleveref| package, there is no need to use \verb|\eqref|.
+
+The following \cref{eq:maxwell_multilabels1,eq:maxwell_multilabels2,eq:maxwell_multilabels3,eq:maxwell_multilabels4} show the same equations as before, with multiple global references rather than sub-referenes and without enclosing brace:
+\begin{align}
+    \nabla\cdot \bm{D} & = \varrho, \label{eq:maxwell_multilabels1} \\
+    \nabla \times \bm{E} +  \pdev{\bm{B}}{t} &= \bm{0}, \label{eq:maxwell_multilabels2} \\
+    \nabla\cdot \bm{B} & = 0, \label{eq:maxwell_multilabels3} \\
+    \nabla \times \bm{H} - \pdev{\bm{D}}{t} &= \bm{J} \label{eq:maxwell_multilabels4}.
+\end{align}
+
+Finally, \cref{eq:maxwell_singlelabel} shows tha same equations as before, but without multiple sub-references.
+\begin{equation}
+    \label{eq:maxwell_singlelabel}
+    \left\{
+    \begin{aligned}
+    \nabla\cdot \bm{D} & = \varrho, \\
+    \nabla \times \bm{E} +  \pdev{\bm{B}}{t} &= \bm{0},\\
+    \nabla\cdot \bm{B} & = 0, \\
+    \nabla \times \bm{H} - \pdev{\bm{D}}{t} &= \bm{J}.
+    \end{aligned}
+    \right.
+\end{equation}
+
+\vspace{\baselineskip}
+
+The following \cref{prop:bibliography} shows how to cite bibliography entries.
+
+\begin{proposition}[Bibliography]
+\label{prop:bibliography}
+    Here is how you cite bibliography entries: \cite{knuth74}, or multiple ones at once: \cite{knuth92,lamport94}.
+\end{proposition}

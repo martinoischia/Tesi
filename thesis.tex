@@ -1,0 +1,31 @@
+% Full instructions available at:
+% https://github.com/elauksap/latex-thesis-mat-polimi
+
+\input{mat-polimi.tex}
+
+\usepackage{lipsum}
+\usepackage{verbatim}
+
+\begin{document}
+    \input{0-front/1-titlepage.tex}
+    \input{0-front/2-titleback.tex}
+
+    \cleardoublepage
+    \phantomsection % Fix PDF link to TOC.
+    \pdfbookmark{\contentsname}{toc}
+    \tableofcontents
+
+    \listoffigures
+	
+    %
+    \input{0-front/3-abstract.tex}
+    \input{0-front/4-sommario.tex}
+    \input{0-front/5-acknowledgments.tex}
+
+    %
+    \input{1-main/1-synopsis.tex}
+    \input{1-main/2-my_chapter.tex}
+    \input{1-main/3-results.tex}
+
+    \printbibliography[title={Bibliography}]
+\end{document}
