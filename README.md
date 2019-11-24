@@ -11,8 +11,8 @@ All the template styles and options are in the `mat-polimi.tex` file:
 edit its content depending on your needs.
 
 > **Note**: by default, the bibliography is compiled through the `biber` backend,
-> which is more modern and customizable than the standard `bibtex` one.
-> Make sure your LaTeX editor uses `biber` as a default bibliography backend.
+> which is more modern and customizable than the standard `bibtex` one.<br />
+> Make sure your LaTeX editor uses `biber` as a default bibliography backend.<br />
 > **Only** in case of troubles, change the `biblatex` package options to `backend=bibtex`.
 
 # Demo
