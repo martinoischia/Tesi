@@ -1,0 +1,61 @@
+\chapter{Formulae}
+\section{Woodbury decomposition}
+\label{sec:wood}
+The following matrix identity holds.
+\begin{proposition}[Woodbury matrix identity]
+    Let $M$ be a square $m\times m$ matrix which can be written as the sum $E+UCV$, with E being $m \times m$, $U$ being $m\times n$, $C$ being a square $n\times n$ matrix, and $V$ $n\times m$. Then
+    \begin{equation}
+        \label{wood}
+        (E + UCV )^{-1} = E^{-1} - E^{-1}U(C^{-1} + V E^{-1}U)^{-1}V E^{-1}
+    \end{equation}
+\end{proposition}
+This equation is exploited for faster system solving in the \verb|fdaPDE| library.
+In the simple space-only problem described \eg in \cite{sangalli}, the presence of covariates leads to a linear system involving the following matrix $M$:
+\begin{equation*}
+    M =
+    \begin{bmatrix}
+        \Psi^TQ\Psi & -\lambda R_1\\
+        -\lambda R_1  & -\lambda R_0
+    \end{bmatrix}
+\end{equation*}
+Remembering that the projection matrix Q is defined as $I-H$, $M$ can be split into the following two components, one independent from $\lambda$:
+\begin{equation*}
+    M =
+    \begin{bmatrix}
+        \Psi^T\Psi & -\lambda R_1\\
+        -\lambda R_1  & -\lambda R_0
+    \end{bmatrix}
+    +
+    \begin{bmatrix}
+        -\Psi^TH\Psi & 0\\
+        0 & 0
+    \end{bmatrix}
+\end{equation*}
+By calling $E$ the matrix on the left (which is also the matrix corresponding to the problem without covariates), and remembering that $H = W(W^TW)^{-1}W^T$, Woodbury decomposition can be exploited defining the following matrices $U, C, V$:
+\begin{equation*}     
+    \begin{bmatrix}
+        -\Psi^TW(W^TW)^{-1}W^T\Psi & 0\\
+        0 & 0
+    \end{bmatrix} = UCV
+\end{equation*}
+\begin{equation*}
+    U = 
+    \begin{bmatrix}
+        \Psi^TW\\
+        0
+    \end{bmatrix}
+\end{equation*}
+\begin{equation*}
+    C = -
+    \begin{bmatrix}
+        (W^TW)^{-1}
+    \end{bmatrix}
+\end{equation*}
+\begin{equation*}
+    V = U^T =
+    \begin{bmatrix}
+        W^T\Psi & 0
+    \end{bmatrix}
+\end{equation*}
+where the $0s$ indicate matrices of zeros of suitable dimensions.\\
+In this way, when computing the solution of the system for different values of $\lambda$, only the factorization of the matrix $E$ will have to be computed.

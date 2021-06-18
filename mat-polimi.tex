@@ -33,6 +33,7 @@
 % Fixes for TOC rendering.
 \usepackage{tocbasic}
 \DeclareTOCStyleEntry[dynnumwidth]{tocline}{figure} % Dynamic label width in list of figures.
+\usepackage[toc,page]{appendix}
 
 
 % Bibliography.
@@ -49,6 +50,7 @@
 % Bold math symbols.
 \usepackage{bm}
 \newcommand{\mathbbm}[1]{\text{\usefont{U}{bbm}{m}{n}#1}} % From mathbbm.sty
+\newcommand{\R}{\mathbbm{R}}
 
 % Custom theorem environments
 \newtheorem{theorem}{Theorem}[chapter]
@@ -105,3 +107,5 @@
 % Set here custom margins.
 \usepackage{geometry}
 \geometry{left=2cm, right=3cm, top=3cm, bottom=4cm}
+
+\usepackage{verbatim}
