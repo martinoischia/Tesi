@@ -6,7 +6,7 @@ The following matrix identity holds.
     Let $M$ be a square $m\times m$ matrix which can be written as the sum $E+UCV$, with E being $m \times m$, $U$ being $m\times n$, $C$ being a square $n\times n$ matrix, and $V$ $n\times m$. Then
     \begin{equation}
         \label{wood}
-        (E + UCV )^{-1} = E^{-1} - E^{-1}U(C^{-1} + V E^{-1}U)^{-1}V E^{-1}
+        \left(E + UCV \right)^{-1} = E^{-1} - E^{-1}U\left(C^{-1} + V E^{-1}U\right)^{-1}V E^{-1}
     \end{equation}
 \end{proposition}
 This equation is exploited for faster system solving in the \verb|fdaPDE| library.
@@ -31,10 +31,10 @@ Remembering that the projection matrix Q is defined as $I-H$, $M$ can be split i
         0 & 0
     \end{bmatrix}
 \end{equation*}
-By calling $E$ the matrix on the left (which is also the matrix corresponding to the problem without covariates), and remembering that $H = W(W^TW)^{-1}W^T$, Woodbury decomposition can be exploited defining the following matrices $U, C, V$:
+By calling $E$ the matrix on the left (which is also the matrix corresponding to the problem without covariates), and remembering that $H = W\left(W^TW\right)^{-1}W^T$, Woodbury decomposition can be exploited defining the following matrices $U, C, V$:
 \begin{equation*}     
     \begin{bmatrix}
-        -\Psi^TW(W^TW)^{-1}W^T\Psi & 0\\
+        -\Psi^TW\left(W^TW\right)^{-1}W^T\Psi & 0\\
         0 & 0
     \end{bmatrix} = UCV
 \end{equation*}
@@ -48,7 +48,7 @@ By calling $E$ the matrix on the left (which is also the matrix corresponding to
 \begin{equation*}
     C = -
     \begin{bmatrix}
-        (W^TW)^{-1}
+        \left(W^TW\right)^{-1}
     \end{bmatrix}
 \end{equation*}
 \begin{equation*}

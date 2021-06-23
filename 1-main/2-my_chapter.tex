@@ -2,9 +2,17 @@
 
 \chapter{My chapter}
 \label{ch:chapter_name}
+\section{Functional}
+...by minimizing the following functional:
+\begin{equation}
+    \label{functional}
+    \begin{split}  
+        J_{\Omega_i, \lambda} \left(\bm{\beta'}, \mathbf{b'_1}, \dots, \mathbf{b'_m}, f_1, \dots, f_m \right) = \\ \sum_{i = 1}^m \left( \sum_{j=1}^{n_i} \left( z_{ij}-\mathbf{w'_{ij}}^T \bm{\beta'} - \mathbf{v'_{ij}}^T \mathbf{b'_i} - f_i(\mathbf{p_{ij}}) \right)^2 + \lambda \int_{\Omega_i} \Delta f_i \left(\bm{p}\right)^2 d\Omega_i\right)
+    \end{split}
+    \end{equation}
 \section{Matrices}
 Assuming $W'_i$ and $V'_i$ for $i=1,\dots,m$ full rank, define the following matrices:\\
-\begin{equation*}
+\begin{equation}
     X =    
     \begin{bmatrix}
         W'_1  & V'_1  & 0      & \ldots    & 0      & 0 \\
@@ -13,9 +21,9 @@ Assuming $W'_i$ and $V'_i$ for $i=1,\dots,m$ full rank, define the following mat
         W'_{m-1} & 0   & 0      & \ldots      & V'_{m-1} & 0 \\
         W'_m  & 0      & 0      & \ldots      & 0      & V'_m
     \end{bmatrix}
-\end{equation*}
+\end{equation}
 with $X\in \R^{N\times(m-1)p+q}$,
-$H = X(X^TX)^{-1}X^T$ and $Q = I_N - H$, $\in \R^{N\times N}$, which are the matrixes that project a vector, respectively, onto the subspace spanned by the columns of X and onto its orthogonal complement with respect to $\R^N$.
+$H = X\left(X^TX\right)^{-1}X^T$ and $Q = I_N - H$, $\in \R^{N\times N}$, which are the matrixes that project a vector, respectively, onto the subspace spanned by the columns of X and onto its orthogonal complement with respect to $\R^N$.
 Notice that despite the matrix $X^TX$ exhibits a pattern where only the first row, the first column and the diagonal are different from 0, the inverse of this type of matrix is usually dense (\textit{might be interesting studying an incomplete factorization of this matrix though}).
 
 The discrete problem leads to the solution of the following linear system of equations:
@@ -55,23 +63,31 @@ In case the dimensions of the monolithic system are treatable, the Woodbury deco
 \begin{equation*}
     C = -
     \begin{bmatrix}
-        (X^TX)^{-1}
+        \left(X^TX\right)^{-1}
     \end{bmatrix}
 \quad \quad
     V = U^T
 \end{equation*}
 
+Once the unknown spatial field $\hat{\bm{f}}$ has been obtained, the vector of unknown coefficients $\hat{\bm{\nu}} = (\bm{\beta}, \bm{b_1}, \dots, \bm{b_m})$ can be computed solving a least-squares problem: the corresponding normal equations are written as
+    
+\begin{equation}
+    \label{nu}
+    \hat{\bm{\nu}} = \left(X^TX\right)^{-1}X^T\left(z - \hat{\bm{f}}_N\right)
+\end{equation}
+where I recall that $\hat{\bm{f}}_N = \tilde{\Psi} \hat{\bm{f}}$
+
 \section{Iterative methods}
 
-Following the ideas stemmed from the spatio-temporal regression in \citeauthor{pollini} \cite{pollini} and \citeauthor{massardi} \cite{massardi}, we consider an iterative scheme. At each step the scheme computes an approximate solution of the monolithic system by solving a single-unit problem for each statistical unit.
-The algorithm stops when one of the following criteria is met:
+Following the ideas stemmed from the spatio-temporal regression in \citeauthor{pollini} \cite{pollini} and \citeauthor{massardi} \cite{massardi}, we consider an iterative scheme. At each step $i$ the scheme computes an approximate solution $(\hat{\mathbf{f}}^{i},\hat{\mathbf{g}}^{i})$ of the monolithic system by solving a single-unit problem for each statistical unit.
+The algorithm stops with two possible criteria:
 \begin{itemize}
     \item A maximum number of iterations is reached;
-    \item The functional of the estimated solution $J_{\Omega_i, \lambda}(\hat{f}^i)$ has reached stagnation, that is the relative increment $(J_{\Omega_i, \lambda}(\hat{f}^i) - J_{\Omega_i, \lambda}(\hat{f}^{i-1})) / J_{\Omega_i, \lambda}(\hat{f}^i)$ is below a certain threshold (in the code $10^{-4}$ was used);
-    \item The estimated solution has reached stagnation, that is the relative increment $\norm{\hat{f}^i-\hat{f}^{i-1}}/\norm{\hat{f}^i}$ is below a certain threshold (in the code $10^{-8}$ was used).
+    \item The following two conditions are true. \\
+    The first one is that the functional \ref{functional} evaluated in the estimated solution $J^i = J_{\Omega_i, \lambda}\left( \hat{\bm{\beta}}^{\prime i}, \hat{\bm{b}}^{\prime i}_1, \dots, \hat{\bm{b}}^{\prime i}_m, \hat{f}_1^i, \dots, \hat{f}_m^i \right)$ has reached stagnation, that is the relative increment $\left( J^i - J^{i-1}\right) / J^i$ is below a certain threshold (in the code such threshold is an input parameter, it was set to $10^{-8}$). The term $ \int_{\Omega_i} \Delta f_i \left(\bm{p}\right)^2 d\Omega_i $ of the functional \ref{functional} is computed by exploiting the expansion into the finite element basis functions, leading to $\hat{\bm{g}}_i^T R_0 \hat{\bm{g}}_i$, where $\hat{\bm{g}}_i $ is the sub-vector of $\hat{\bm{g}}$ corresponding to unit $i$.\\
+    The second one is that the estimated solution is very close to the exact solution of the system \ref{mono}, condition that is verified by checking that the residual, normalized by the Euclidian norm of the right-hand side, is below a certain threshold (this is another input parameter, $10^{-8}$ was used).
 \end{itemize}
 The details of a first possible implementation are described in the following section.
-
 
 \subsection{The block diagonal approach}
 \label[subsection]{iter}
@@ -83,7 +99,7 @@ To this purpose, the following approximation is first considered:
 
 \begin{equation}
     \label{blockdia}
-    \tilde{\Psi}^TQ\tilde{\Psi} =
+    \tilde{\Psi}^TQ\tilde{\Psi}\simeq \Gamma := 
     \begin{bmatrix}
         \Psi^TQ_1\Psi & 0& \dots & 0\\
         0 & \Psi^TQ_2\Psi & \ddots & \vdots\\
@@ -91,8 +107,8 @@ To this purpose, the following approximation is first considered:
         0 & \dots & 0 & \Psi^TQ_m\Psi\\
     \end{bmatrix}    
 \end{equation}
-Here $Q_i$ indicates the $i$-th diagonal block of $Q$ of dimension $n \times n$. By definition of $Q$, it is equal to $I_n-X_i(X^TX)^{-1}X_i^T$, with $X_i=X((i-1)m+1 : im\,, \;:\; )$, where the typical notation of the MATLAB language has been used to express a suitable submatrix.\\
-Another possible way to express the blocks $\Psi^TQ_i\Psi$ of matrix \ref{blockdia} is through Woodbury decomposition (appendix \ref{sec:wood}) with a use analogous to the one in \ref{eq:wootilde}. In fact, $\Psi^TQ_i\Psi$ is the $i$-th block diagonal of matrix $\tilde{\Psi}^TQ\tilde{\Psi}$, which in turn can be expressed as $\tilde{\Psi}^T\tilde{\Psi}-\tilde{\Psi}^TH\tilde{\Psi}$. Thus, defining $U = \tilde{\Psi}^TX$, $C = -(X^TX)^{-1}$,$V =U^T$, matrix $\Psi^TQ_i\Psi$ can be expressed as $\Psi^T\Psi +  U_iCV_i $, where $U_i = U((i-1)m+1 : im\,, \;:\;)$, $V_i = U_i^T $.
+Here $Q_i$ indicates the $i$-th diagonal block of $Q$ of dimension $n \times n$. By definition of $Q$, it is equal to $I_n-X_i\left(X^TX\right)^{-1}X_i^T$, with $X_i=X\left(\left(i-1\right)m+1 : im\,, \;:\; \right)$, where the typical notation of the MATLAB language has been used to express a suitable submatrix.\\
+Another possible way to express the blocks $\Psi^TQ_i\Psi$ of matrix \ref{blockdia} is through Woodbury decomposition (appendix \ref{sec:wood}) with a use analogous to the one in \ref{eq:wootilde}. In fact, $\Psi^TQ_i\Psi$ is the $i$-th block diagonal of matrix $\tilde{\Psi}^TQ\tilde{\Psi}$, which in turn can be expressed as $\tilde{\Psi}^T\tilde{\Psi}-\tilde{\Psi}^TH\tilde{\Psi}$. Thus, defining $U = \tilde{\Psi}^TX$, $C = -\left(X^TX\right)^{-1}$,$V =U^T$, matrix $\Psi^TQ_i\Psi$ can be expressed as $\Psi^T\Psi +  U_iCV_i $, where $U_i = U\left(\left(i-1\right)m+1 : im\,, \;:\;\right)$, $V_i = U_i^T $.
 
 \subsection{Initialization}
 The inizialization consists in finding a good guess $(\hat{\mathbf{f}}^0,\hat{\mathbf{g}}^0)$ to start the algorithm from; for this purpose, the following $m$ problems are solved: for $i = 1, \dots, m$ solve
@@ -132,8 +148,8 @@ For example, the first $n$ equations of the monolithic system \ref{mono} read
         \mathbf{u}_1
     \end{bmatrix}
 \end{equation}
-where $Q_{i,j}$ indicates block of row $i$ and column $j$ of matrix $Q$.
-Substituting $\hat{\mathbf{f}}_j$ for $j=1,\dots,m$ with $\hat{\mathbf{f}}_j^{k-1}$ and generalizing, the iterative scheme reads: for $i = 1, \dots, m$ solve
+where $Q_{i,j}$ indicates block of row $i$ and column $j$ of matrix $Q$, which also coincides with $-H_{i,j}$ for $i \neq j$.
+Substituting $\hat{\mathbf{f}}_j$ for $j=1,\dots,m$ with $\hat{\mathbf{f}}_j^{k-1}$, taking it to the right-hand side and generalizing, the iterative scheme reads: for $i = 1, \dots, m$ solve
 \begin{equation}
     \begin{bmatrix}
         \Psi^TQ_i\Psi & -\lambda R_1\\
@@ -154,3 +170,25 @@ where
      \mathbf{r}_i =\mathbf{u}_i -\sum_{\substack{j=1\\ j\neq i}}^m \Psi^TQ_{i,j} \Psi \hat{\mathbf{f}}_j^{k-1}
 \end{equation}
 
+An estimate of $\hat{\bm{\nu}} = \bm{\beta}, \bm{b_1}, \dots, \bm{b_m} $ has to be computed at each iteration for the estimation of the functional \ref{functional}, according to equation \ref{nu}.
+
+\subsection{The iterative method as a preconditioned Richardson method}
+Given a generic preconditioning matrix $P$, calling $\bm{r}_k$ the residual at step $k$,
+Richardson method consists in solving (or rather trying to) a linear system characterized by matrix $A$ iterating the following steps:
+\begin{enumerate}
+    \item Solve $P \bm{z}_k = \bm{r}_k$
+    \item Compute the acceleration parameter $\alpha_k$ (for simplicity we can use $\alpha_k = 1$)
+    \item Update the solution $ \bm{x}_{k+1} = \bm{x}_{k} + \alpha_k \bm{z}_k $
+    \item Update the residual $\bm{r}_{k+1} = \bm{r}_{k} - \alpha_k A \bm{z}_k$
+\end{enumerate}
+
+The iterative scheme described in the previous section is a Richardson scheme with the following preconditioning matrix:
+\begin{equation}
+    \label{precond}
+    P=
+    \begin{bmatrix}
+        \Gamma & -\lambda \tilde{R}_1\\
+        -\lambda \tilde{R}_1  & -\lambda \tilde{R}_0
+    \end{bmatrix}
+\end{equation}
+Solving a linear system involving this matrix is indeed like solving $m$ linear systems of dimensions $2n\times 2n$  
