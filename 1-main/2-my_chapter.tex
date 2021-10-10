@@ -11,7 +11,7 @@
     \end{split}
     \end{equation}
 \section{Matrices}
-Assuming $W'_i$ and $V'_i$ for $i=1,\dots,m$ full rank, define the following matrices:\\
+Assuming $W'_i$ and $V'_i$ for $i=1,\dots,m$ full rank, define the following matrices:
 \begin{equation}
     X =    
     \begin{bmatrix}
@@ -24,14 +24,21 @@ Assuming $W'_i$ and $V'_i$ for $i=1,\dots,m$ full rank, define the following mat
 \end{equation}
 with $X\in \R^{N\times(m-1)p+q}$,
 $H = X\left(X^TX\right)^{-1}X^T$ and $Q = I_N - H$, $\in \R^{N\times N}$, which are the matrixes that project a vector, respectively, onto the subspace spanned by the columns of X and onto its orthogonal complement with respect to $\R^N$.
-Notice that despite the matrix $X^TX$ exhibits a pattern where only the first row, the first column and the diagonal are different from 0, the inverse of this type of matrix is usually dense (\textit{might be interesting studying an incomplete factorization of this matrix though}).
+Notice that despite the matrix $X^TX$ exhibits a pattern where only the first row, the first column and the diagonal are different from 0, the inverse of this type of matrix is usually dense.
+
+Define also the vector of coefficients $\bm{\nu} = (\bm{\beta}^\prime, \bm{b}_1^\prime, \dots, \bm{b}_m^\prime)$.\\
+Given this definitions, we can write the mixed-effect model in implementative version with this compact formula
+\begin{equation}
+    \label{modelX}
+    \bm{z} = X \bm{\nu} + \bm{f}_N + \bm{\epsilon}
+\end{equation}
 
 The discrete problem leads to the solution of the following linear system of equations:
 
 \begin{equation}
     \label{mono}
     \begin{bmatrix}
-        \tilde{\Psi}^TQ\tilde{\Psi} & -\lambda \tilde{R}_1\\
+        \tilde{\Psi}^TQ\tilde{\Psi} & -\lambda \tilde{R}_1^T\\
         -\lambda \tilde{R}_1  & -\lambda \tilde{R}_0
     \end{bmatrix}
     \begin{bmatrix}
@@ -50,7 +57,7 @@ In case the dimensions of the monolithic system are treatable, the Woodbury deco
     \label{eq:wootilde}
     E =
     \begin{bmatrix}
-        \tilde{\Psi}^T\tilde{\Psi} & -\lambda \tilde{R}_1\\
+        \tilde{\Psi}^T\tilde{\Psi} & -\lambda \tilde{R}_1^T\\
         -\lambda \tilde{R}_1  & -\lambda \tilde{R}_0
     \end{bmatrix}
 \quad
@@ -69,13 +76,13 @@ In case the dimensions of the monolithic system are treatable, the Woodbury deco
     V = U^T
 \end{equation*}
 
-Once the unknown spatial field $\hat{\bm{f}}$ has been obtained, the vector of unknown coefficients $\hat{\bm{\nu}} = (\bm{\beta}, \bm{b_1}, \dots, \bm{b_m})$ can be computed solving a least-squares problem: the corresponding normal equations are written as
+Once the unknown spatial field $\hat{\bm{f}}$ has been obtained, the vector of unknown coefficients $\hat{\bm{\nu}} = (\hat{\bm{\beta}}^\prime, \hat{\bm{b}}_1^\prime, \dots, \hat{\bm{b}}_m^\prime)$ can be computed solving a least-squares problem: the corresponding normal equations are written as
     
 \begin{equation}
     \label{nu}
-    \hat{\bm{\nu}} = \left(X^TX\right)^{-1}X^T\left(z - \hat{\bm{f}}_N\right)
+    \hat{\bm{\nu}} = \left(X^TX\right)^{-1}X^T\left(\bm{z} - \hat{\bm{f}}_N\right)
 \end{equation}
-where I recall that $\hat{\bm{f}}_N = \tilde{\Psi} \hat{\bm{f}}$
+where I recall that $\hat{\bm{f}}_N = \tilde{\Psi} \hat{\bm{f}}$.
 
 \section{Iterative methods}
 
@@ -93,7 +100,7 @@ The details of a first possible implementation are described in the following se
 \label[subsection]{iter}
 
 Looking at the monolithic equation \ref{mono}, the question of how to formulate an approximation of the term $\tilde{\Psi}^TQ\tilde{\Psi}$ naturally arises. 
-In particular, a suitable block approximation allows to make the estimated field $\hat{f}_i$ of statistical unit $i$ independent from the observations in the other units, for every unit $i$.
+In particular, a suitable block approximation allows to make the estimated field $\hat{f}_i$ of statistical unit $i$ independent from the observations in the other units, for every unit $i$ ($i = 1 \dots m$).
 
 To this purpose, the following approximation is first considered:
 
@@ -107,14 +114,39 @@ To this purpose, the following approximation is first considered:
         0 & \dots & 0 & \Psi^TQ_m\Psi\\
     \end{bmatrix}    
 \end{equation}
-Here $Q_i$ indicates the $i$-th diagonal block of $Q$ of dimension $n \times n$. By definition of $Q$, it is equal to $I_n-X_i\left(X^TX\right)^{-1}X_i^T$, with $X_i=X\left(\left(i-1\right)m+1 : im\,, \;:\; \right)$, where the typical notation of the MATLAB language has been used to express a suitable submatrix.\\
-Another possible way to express the blocks $\Psi^TQ_i\Psi$ of matrix \ref{blockdia} is through Woodbury decomposition (appendix \ref{sec:wood}) with a use analogous to the one in \ref{eq:wootilde}. In fact, $\Psi^TQ_i\Psi$ is the $i$-th block diagonal of matrix $\tilde{\Psi}^TQ\tilde{\Psi}$, which in turn can be expressed as $\tilde{\Psi}^T\tilde{\Psi}-\tilde{\Psi}^TH\tilde{\Psi}$. Thus, defining $U = \tilde{\Psi}^TX$, $C = -\left(X^TX\right)^{-1}$,$V =U^T$, matrix $\Psi^TQ_i\Psi$ can be expressed as $\Psi^T\Psi +  U_iCV_i $, where $U_i = U\left(\left(i-1\right)m+1 : im\,, \;:\;\right)$, $V_i = U_i^T $.
+Here $Q_i$ indicates the $i$-th diagonal block of $Q$ of dimension $n \times n$. By definition of $Q$, it is equal to $I_n-X_i\left(X^TX\right)^{-1}X_i^T$, with $X_i=X\left(\left(i-1\right)n+1 : in\,, \;:\; \right)$, where the typical notation of the MATLAB language has been used to express a suitable submatrix.\\
+Another possible way to express the blocks $\Psi^TQ_i\Psi$ of matrix \ref{blockdia} is through Woodbury decomposition (appendix \ref{sec:wood}) with a use analogous to the one in \ref{eq:wootilde}.\\
+ To show it, we notice that $\Psi^TQ_i\Psi$ is the $i$-th diagonal block of matrix $\tilde{\Psi}^TQ\tilde{\Psi}$.
+In fact $\tilde{\Psi}^TQ\tilde{\Psi}$ can be expressed as $\tilde{\Psi}^T\tilde{\Psi}-\tilde{\Psi}^TH\tilde{\Psi}$. Thus, defining $U = \tilde{\Psi}^TX$, $C = -\left(X^TX\right)^{-1}$,$V =U^T$, its $i$-th diagonal block is equal to $\Psi^T\Psi +  U_iCV_i $, where
+\begin{equation}
+    \begin{split}
+        U_i = U\left(\left(i-1\right)N_\mathcal{T}+1 : iN_\mathcal{T}\,, \;:\;\right) = \tilde{\Psi}^T_iX =\\
+        \begin{bmatrix}
+            0 & \dots & 0 & \Psi^T & 0 & \dots & 0
+        \end{bmatrix}
+        \begin{bmatrix}
+            X_1\\
+            \vdots\\
+            X_i\\
+            \vdots\\
+            X_m
+        \end{bmatrix}
+        = \Psi^T X_i
+    \end{split}
+\end{equation}
+\begin{equation}
+    V_i = U_i^T = X^T_i\Psi
+\end{equation}
+In such a way we have
+\begin{equation}
+    \Psi^T\Psi +  U_iCV_i = \Psi^T \left( I_n-X_i\left(X^TX\right)^{-1}X_i^T \right) \Psi = \Psi^T Q_i \Psi
+\end{equation}
 
 \subsection{Initialization}
 The inizialization consists in finding a good guess $(\hat{\mathbf{f}}^0,\hat{\mathbf{g}}^0)$ to start the algorithm from; for this purpose, the following $m$ problems are solved: for $i = 1, \dots, m$ solve
 \begin{equation}
         \begin{bmatrix}
-            \Psi^TQ_i\Psi & -\lambda R_1\\
+            \Psi^TQ_i\Psi & -\lambda R_1^T\\
             -\lambda R_1  & -\lambda R_0
         \end{bmatrix}
         \begin{bmatrix}
@@ -134,7 +166,7 @@ The idea behind the iterative scheme is, having a guess of a solution $(\hat{\ma
 For example, the first $n$ equations of the monolithic system \ref{mono} read
 \begin{equation}
     \begin{bmatrix}
-        \Psi^TQ_{1,1}\Psi & \Psi^TQ_{1,2}\Psi &\dots &\Psi^TQ_{1,m}\Psi & -\lambda R_1\\
+        \Psi^TQ_{1,1}\Psi & \Psi^TQ_{1,2}\Psi &\dots &\Psi^TQ_{1,m}\Psi & -\lambda R_1^T\\
     \end{bmatrix}
     \begin{bmatrix}
         \hat{\mathbf{f}}_1\\
@@ -152,7 +184,7 @@ where $Q_{i,j}$ indicates block of row $i$ and column $j$ of matrix $Q$, which a
 Substituting $\hat{\mathbf{f}}_j$ for $j=1,\dots,m$ with $\hat{\mathbf{f}}_j^{k-1}$, taking it to the right-hand side and generalizing, the iterative scheme reads: for $i = 1, \dots, m$ solve
 \begin{equation}
     \begin{bmatrix}
-        \Psi^TQ_i\Psi & -\lambda R_1\\
+        \Psi^TQ_i\Psi & -\lambda R_1^T\\
         -\lambda R_1  & -\lambda R_0
     \end{bmatrix}
     \begin{bmatrix}
@@ -170,15 +202,15 @@ where
      \mathbf{r}_i =\mathbf{u}_i -\sum_{\substack{j=1\\ j\neq i}}^m \Psi^TQ_{i,j} \Psi \hat{\mathbf{f}}_j^{k-1}
 \end{equation}
 
-An estimate of $\hat{\bm{\nu}} = \bm{\beta}, \bm{b_1}, \dots, \bm{b_m} $ has to be computed at each iteration for the estimation of the functional \ref{functional}, according to equation \ref{nu}.
+An estimate of $\bm{\nu}$, $\hat{\bm{\nu}}^i = (\hat{\bm{\beta}}^{\prime i}, \hat{\bm{b}}_1^{\prime i}, \dots, \hat{\bm{b}}_m^{\prime i})$ has to be computed at each iteration for the estimation of the functional \ref{functional}, according to equation \ref{nu}.
 
 \subsection{The iterative method as a preconditioned Richardson method}
-Given a generic preconditioning matrix $P$, calling $\bm{r}_k$ the residual at step $k$,
-Richardson method consists in solving (or rather trying to) a linear system characterized by matrix $A$ iterating the following steps:
+Given a generic preconditioning matrix $P$, calling $\bm{r}_k$ the residual of the linear system $A \bm{x} = \bm{b}$ (that is the vector $A \bm{x}_k - \bm{b}$ )at step $k$,
+Richardson method (\textit{cf.}, for example, \cite{Quarteroni})consists in solving (or rather trying to) the linear system iterating the following steps:
 \begin{enumerate}
     \item Solve $P \bm{z}_k = \bm{r}_k$
-    \item Compute the acceleration parameter $\alpha_k$ (for simplicity we can use $\alpha_k = 1$)
-    \item Update the solution $ \bm{x}_{k+1} = \bm{x}_{k} + \alpha_k \bm{z}_k $
+    \item Compute the acceleration parameter $\alpha_k$ (for simplicity we use $\alpha_k = 1$)
+    \item Update the solution $ \bm{x}_{k+1} = \bm{x}_{k} - \alpha_k \bm{z}_k $
     \item Update the residual $\bm{r}_{k+1} = \bm{r}_{k} - \alpha_k A \bm{z}_k$
 \end{enumerate}
 
@@ -187,8 +219,28 @@ The iterative scheme described in the previous section is a Richardson scheme wi
     \label{precond}
     P=
     \begin{bmatrix}
-        \Gamma & -\lambda \tilde{R}_1\\
+        \Gamma & -\lambda \tilde{R}_1^T\\
         -\lambda \tilde{R}_1  & -\lambda \tilde{R}_0
     \end{bmatrix}
 \end{equation}
-Solving a linear system involving this matrix is indeed like solving $m$ linear systems of dimensions $2n\times 2n$  
+Solving a linear system involving this matrix is indeed like solving $m$ linear systems of dimensions $2n\times 2n$.
+\section{Generalized cross validation}
+\underline{As we mentioned before}, the system is solved multiple times on a grid of $\lambda s$. The best $\lambda$ is then chosen according
+to a generalized cross-validation criterion. In particular, as in \cite{sangalli}, the minimum of the generalized cross-validation (GCV) parameter is used as a model selection criterion. The generalization of this parameter to the mixed-effect model reads as follows:
+\begin{equation}
+    \label{GCV}
+    GCV(\lambda) = \frac{1}{N\left(1-\left(q-p+mp+tr\left(S\right)\right)/N\right)^2}\norm{\bm{z} - \hat{\bm{z}}}^2
+\end{equation}
+\underline{where for $q$, $m$, $p$ we follow the notation of section ?}, and S indicates the smoothing matrix, which is the matrix that maps the observations vector $\bm{z}$ into the estimated spatial field $\hat{\bm{f}}$ evaluated at the location of the observations ($\,\hat{\bm{f}}_N = \tilde{\Psi}\hat{\bm{f}} = S z\,$). Its value is
+\begin{equation}
+        S = \tilde{\Psi} \left(\tilde{\Psi}^TQ\tilde{\Psi} + \lambda \tilde{R}_1^T
+        \tilde{R}_0^{-1} \tilde{R}_1\right)^{-1}\tilde{\Psi}^TQ
+\end{equation}
+and it stems as a Schur complement for system \ref{mono} with respect to the estimated field $\hat{\bm{f}}$.\\
+The computation of the GCV parameter \ref{GCV} involves the expensive computation of the trace of the smoothing matrix $S$.
+Since for any two matrices $A$ and $B$ such that the product $AB$ is defined, it holds that $tr\left(AB\right) = tr\left(BA\right)$, the trace of $S$ can be computed as the trace of
+\begin{equation}
+    \tilde{S} = \left(\tilde{\Psi}^TQ\tilde{\Psi} + \lambda \tilde{R}_1^T
+    \tilde{R}_0^{-1} \tilde{R}_1\right)^{-1}\tilde{\Psi}^TQ \tilde{\Psi}
+\end{equation}
+

@@ -1,0 +1,77 @@
+% !TEX root = ../thesis.tex
+\chapter{Statistical inference}
+\section{Properties of the estimators}
+\subsection{Spatial field component}
+\nocite{*}
+To study the statistical properties of the estimated spatial field that is obtained by solving the monolithic system \ref{mono}, we write it in the following equivalent manner
+\begin{equation}
+    \begin{cases}
+        \tilde{\Psi}^TQ\tilde{\Psi} \hat{\bm{f}} -\lambda \tilde{R}_1^T \hat{\bm{g}} = \tilde{\Psi}^T Q\mathbf{z}\\
+        \hat{\bm{g}} = - \tilde{R}_0^{-1} \tilde{R}_1 \hat{\bm{f}}
+    \end{cases}
+\end{equation}
+By recalling the mixed-effect model in the implementative form \ref{modelX}, that is $\bm{z} = X \bm{\nu} + \bm{f}_N + \bm{\epsilon}$, and substituting the second equation inside the first we get
+\begin{equation}
+    \tilde{\Psi}^TQ\tilde{\Psi} \hat{\bm{f}} +\lambda \tilde{R}_1^T \tilde{R}_0^{-1} \tilde{R}_1 \hat{\bm{f}} = \tilde{\Psi}^T Q \left( X \bm{\nu} + \bm{f}_N + \bm{\epsilon} \right)
+\end{equation}
+Recalling that Q projects on the orthogonal space of the columns of X, implying $Q X = 0$,
+\begin{equation}
+    \left(\tilde{\Psi}^TQ\tilde{\Psi} +\lambda \tilde{R}_1^T \tilde{R}_0^{-1} \tilde{R}_1 \right) \hat{\bm{f}} = \tilde{\Psi}^T Q \bm{f}_N + \tilde{\Psi}^T Q \bm{\epsilon}
+\end{equation}
+That can be rearranged as follows
+\begin{equation}
+    \left(\tilde{\Psi}^TQ\tilde{\Psi} +\lambda \tilde{R}_1^T \tilde{R}_0^{-1} \tilde{R}_1 \right) 
+    \left(\hat{\bm{f}} - \bm{f}\right)
+    + \lambda \tilde{R}_1^T \tilde{R}_0^{-1} \tilde{R}_1 \bm{f} = \tilde{\Psi}^T Q \bm{\epsilon}
+\end{equation}
+where we have defined $\bm{f}$ as the coefficients of the finite element expansion of the true vector field $f(\cdot)$.
+Deriving now the term $\hat{\bm{f}} - \bm{f}$
+\begin{equation}
+    \hat{\bm{f}} - \bm{f} =
+    -\left(\tilde{\Psi}^TQ\tilde{\Psi} +\lambda \tilde{R}_1^T \tilde{R}_0^{-1} \tilde{R}_1 \right)^{-1}
+    \lambda \tilde{R}_1^T \tilde{R}_0^{-1} \tilde{R}_1 \bm{f} +
+    \left(\tilde{\Psi}^TQ\tilde{\Psi} +\lambda \tilde{R}_1^T \tilde{R}_0^{-1} \tilde{R}_1 \right)^{-1} 
+    \tilde{\Psi}^T Q \bm{\epsilon}
+\end{equation}
+The first term above is not random, thus we can derive the following: \begin{enumerate}[wide, labelindent=0pt]
+    \item Thanks to the property that, for generic suitably dimensioned matrices and vectors, $\mathbb{E}\left[M \bm{x}\right] = M \mathbb{E}\left[\bm{x}\right]$, we get that $\mathbb{E}\left[\hat{\bm{f}} - \bm{f}\right] = 
+    -\left(\tilde{\Psi}^TQ\tilde{\Psi} +\lambda \tilde{R}_1^T \tilde{R}_0^{-1} \tilde{R}_1 \right)^{-1}
+    \lambda \tilde{R}_1^T \tilde{R}_0^{-1} \tilde{R}_1 \bm{f}$;
+    \item Thanks to the property that again, for generic suitably dimensioned matrices and vectors, $Var  \left[M \bm{x}\right] = M Var\left[\bm{x}\right] M^T$, we get this result for $Var\left[\hat{\bm{f}} - \bm{f}\right] = Var \left[\hat{\bm{f}}\right]$
+    \begin{equation}
+        Var\left[\hat{\bm{f}} - \bm{f}\right] =
+        \sigma^2 \left(\tilde{\Psi}^TQ\tilde{\Psi} +\lambda \tilde{R}_1^T \tilde{R}_0^{-1} \tilde{R}_1 \right)^{-1} \tilde{\Psi}^T Q
+        \tilde{\Psi} \left(\tilde{\Psi}^TQ\tilde{\Psi} +\lambda \tilde{R}_1^T \tilde{R}_0^{-1} \tilde{R}_1 \right)^{-1}
+    \end{equation}
+    where we have exploited symmetric matrices and the fact that $Q^2 = Q$.
+\end{enumerate}
+\subsection{Parametric component}
+For what concerns the estimation of the parameter $\bm{\nu}$, we recall that $\hat{\bm{\nu}}$ solves the normal equations
+\begin{equation}
+    X^T X \hat{\bm{\nu}} = X^T \left( \bm{z} - \tilde{\Psi} \hat{\bm{f}} \right)
+\end{equation}
+that with model \ref{modelX} can be written as
+\begin{equation}
+    X^T X \hat{\bm{\nu}} = 
+    X^T \left( X \bm{\nu} + \tilde{\Psi} \bm{f} + \bm{\epsilon}
+    - \tilde{\Psi} \hat{\bm{f}} \right)
+\end{equation}
+or
+\begin{equation}
+    X^T X \left(\hat{\bm{\nu}} - \bm{\nu}\right)= -
+    X^T \tilde{\Psi} \left( \hat{\bm{f}} - \bm{f} \right)
+    + X^T \bm{\epsilon}
+\end{equation}
+From this we can derive:
+\begin{equation}    
+    \mathbb{E}\left[\hat{\bm{\nu}} - \bm{\nu}\right] =
+    \left(X^T X\right)^{-1} X^T
+    \tilde{\Psi}\left(\tilde{\Psi}^TQ\tilde{\Psi} +\lambda \tilde{R}_1^T \tilde{R}_0^{-1} \tilde{R}_1 \right)^{-1}
+    \lambda \tilde{R}_1^T \tilde{R}_0^{-1} \tilde{R}_1 \bm{f}
+\end{equation}
+and the expression of $Var \left[\hat{\bm{\nu}} - \bm{\nu}\right]$ that is not reported for brevity.
+
+\subsection{Asymptotic properties}
+We study the limiting properties of the estimators in the setting where the number of basis $N_\mathcal{T}$ and the triangulation $\mathcal{T}$ are fixed. The number of observation $n_i$ for each statistical unit increases to infinity.
+
+In a similar fashion as in \cite{sangalli2}, where the simple spatial problem is considered, we make some assumptions for studying the asymptotic properties of the considered estimators.
