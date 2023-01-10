@@ -1,0 +1,22 @@
+% !TEX root = ../thesis.tex
+
+\chapter{Introduction}
+\label{ch:intro}
+
+\section{Spatial regression with partial differential equation regularization}
+This work naturally stems from the studies in the research field called Spatial Regression with Partial Differential Equation regularization, abbreviated in the following as SR-PDE. SR-PDE constitutes a family of models which has been, and still is, under study beginning from \citeyear{sangalli0} in \citeauthor{sangalli0} \cite{sangalli0}.
+
+SR-PDE effectively combines several branches of mathematics and statistics modeling. For a thorough analysis of its derivation and the enhancements it brings to the existing literature see \cite{sangalli1}, I will limit myself to a brief introduction.\\
+These models feature the minimization of a functional composed of two terms: a classical least-square term, with the goal of estimating a vector of unknown regression coefficients (in case of presence of covariates), and a regularization term, estimating an unknown deterministic spatial field.\\
+The spatial field contributes to the functional by integration over the spatial domain of the square of a differential operator, most commonly the Laplacian operator. By properties of the Laplace operator, this choice induces an isotropic and stationary smoothing effect on the unknown spatial field, meaning equal in every direction and independent on the position. Other differential operators considered in this work are generic second order differential operators, that come from the physics of the problem or from some preexisting knowledge about the phenomenon under study. 
+
+The inclusion of partial differential equations in the statistical model brings many advantages, like the aforementioned ability to include problem specific knowledge, dealing with boundary conditions, etc., but makes computations more cumbersome. 
+
+\section{The mixed-effects model}
+Mixed-effects models combines fixed-effects 
+At the $i$-th statistical unit, the observation $j$, for $j = 1 \dots n_i$, is modeled as
+\begin{equation}
+    \label{model}
+    z_{ij} = \bm{w}_{ij}^T \bm{\beta} + \bm{v}_{ij}^T \bm{b}_i + f_i(\bm{p_{ij}}) + \epsilon_{ij}
+\end{equation}
+$\epsilon_{ij}$, for every $i$ and $j$, are the random noise or errors, considered as the realizations of independent identically distributed (i.i.d.) random variables, with mean $0$ and variance $\sigma^2$. 

@@ -23,11 +23,11 @@ Assuming $W'_i$ and $V'_i$ for $i=1,\dots,m$ full rank, define the following mat
     \end{bmatrix}
 \end{equation}
 with $X\in \R^{N\times(m-1)p+q}$,
-$H = X\left(X^TX\right)^{-1}X^T$ and $Q = I_N - H$, $\in \R^{N\times N}$, which are the matrixes that project a vector, respectively, onto the subspace spanned by the columns of X and onto its orthogonal complement with respect to $\R^N$.
+$H = X\left(X^TX\right)^{-1}X^T$ and $Q = I_N - H$, $\in \R^{N\times N}$, which are the matrices that project a vector, respectively, onto the subspace spanned by the columns of X and onto its orthogonal complement with respect to $\R^N$.
 Notice that despite the matrix $X^TX$ exhibits a pattern where only the first row, the first column and the diagonal are different from 0, the inverse of this type of matrix is usually dense.
 
 Define also the vector of coefficients $\bm{\nu} = (\bm{\beta}^\prime, \bm{b}_1^\prime, \dots, \bm{b}_m^\prime)$.\\
-Given this definitions, we can write the mixed-effect model in implementative version with this compact formula
+Given these definitions, we can write the mixed-effect model in implementation version with this compact formula
 \begin{equation}
     \label{modelX}
     \bm{z} = X \bm{\nu} + \bm{f}_N + \bm{\epsilon}
@@ -51,7 +51,7 @@ The discrete problem leads to the solution of the following linear system of equ
         0
     \end{bmatrix}
 \end{equation}
-We call it monolithic because the number of units might be big and so the number of nodes for each unit. Therefore our aim is to avoid the solution of such high dimension linear system, in favour of splitting it into many systems of lower dimension.
+We call it monolithic because the number of units might be big and so the number of nodes for each unit. Therefore, our aim is to avoid the solution of such high dimension linear system, in favor of splitting it into many systems of lower dimension.
 In case the dimensions of the monolithic system are treatable, the Woodbury decomposition formula, described in appendix \ref{sec:wood}, can be used to speed up the computation of the solution for different values of $\lambda$. The decomposition is entirely analogous to the one described in the appendix, with
 \begin{equation}
     \label{eq:wootilde}
@@ -92,7 +92,7 @@ The algorithm stops with two possible criteria:
     \item A maximum number of iterations is reached;
     \item The following two conditions are true. \\
     The first one is that the functional \ref{functional} evaluated in the estimated solution $J^i = J_{\Omega_i, \lambda}\left( \hat{\bm{\beta}}^{\prime i}, \hat{\bm{b}}^{\prime i}_1, \dots, \hat{\bm{b}}^{\prime i}_m, \hat{f}_1^i, \dots, \hat{f}_m^i \right)$ has reached stagnation, that is the relative increment $\left( J^i - J^{i-1}\right) / J^i$ is below a certain threshold (in the code such threshold is an input parameter, it was set to $10^{-8}$). The term $ \int_{\Omega_i} \Delta f_i \left(\bm{p}\right)^2 d\Omega_i $ of the functional \ref{functional} is computed by exploiting the expansion into the finite element basis functions, leading to $\hat{\bm{g}}_i^T R_0 \hat{\bm{g}}_i$, where $\hat{\bm{g}}_i $ is the sub-vector of $\hat{\bm{g}}$ corresponding to unit $i$.\\
-    The second one is that the estimated solution is very close to the exact solution of the system \ref{mono}, condition that is verified by checking that the residual, normalized by the Euclidian norm of the right-hand side, is below a certain threshold (this is another input parameter, $10^{-8}$ was used).
+    The second one is that the estimated solution is very close to the exact solution of the system \ref{mono}, condition that is verified by checking that the residual, normalized by the Euclidean norm of the right-hand side, is below a certain threshold (this is another input parameter, $10^{-8}$ was used).
 \end{itemize}
 The details of a first possible implementation are described in the following section.
 
@@ -100,7 +100,7 @@ The details of a first possible implementation are described in the following se
 \label[subsection]{iter}
 
 Looking at the monolithic equation \ref{mono}, the question of how to formulate an approximation of the term $\tilde{\Psi}^TQ\tilde{\Psi}$ naturally arises. 
-In particular, a suitable block approximation allows to make the estimated field $\hat{f}_i$ of statistical unit $i$ independent from the observations in the other units, for every unit $i$ ($i = 1 \dots m$).
+In particular, a suitable block approximation allows to make the estimated field $\hat{f}_i$ of statistical unit $i$ independent of the observations in the other units, for every unit $i$ ($i = 1 \dots m$).
 
 To this purpose, the following approximation is first considered:
 
@@ -223,10 +223,10 @@ The iterative scheme described in the previous section is a Richardson scheme wi
         -\lambda \tilde{R}_1  & -\lambda \tilde{R}_0
     \end{bmatrix}
 \end{equation}
-Solving a linear system involving this matrix is indeed like solving $m$ linear systems of dimensions $2n\times 2n$.
+Solving an awfully hard linear system involving this matrix is indeed like solving $m$ linear systems of dimensions $2n\times 2n$.
 \section{Generalized cross validation}
 \underline{As we mentioned before}, the system is solved multiple times on a grid of $\lambda s$. The best $\lambda$ is then chosen according
-to a generalized cross-validation criterion. In particular, as in \cite{sangalli}, the minimum of the generalized cross-validation (GCV) parameter is used as a model selection criterion. The generalization of this parameter to the mixed-effect model reads as follows:
+to a generalized cross-validation criterion. In particular, as in \cite{sangalli1}, the minimum of the generalized cross-validation (GCV) parameter is used as a model selection criterion. The generalization of this parameter to the mixed-effect model reads as follows:
 \begin{equation}
     \label{GCV}
     GCV(\lambda) = \frac{1}{N\left(1-\left(q-p+mp+tr\left(S\right)\right)/N\right)^2}\norm{\bm{z} - \hat{\bm{z}}}^2
