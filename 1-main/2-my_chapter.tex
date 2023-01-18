@@ -2,14 +2,6 @@
 
 \chapter{My chapter}
 \label{ch:chapter_name}
-\section{Functional}
-...by minimizing the following functional:
-\begin{equation}
-	\label{functional}
-	\begin{split}
-		J_{\Omega_i, \lambda} \left(\bm{\beta'}, \mathbf{b'_1}, \dots, \mathbf{b'_m}, f_1, \dots, f_m \right) = \\ \sum_{i = 1}^m \left( \sum_{j=1}^{n_i} \left( z_{ij}-\mathbf{w'_{ij}}^T \bm{\beta'} - \mathbf{v'_{ij}}^T \mathbf{b'_i} - f_i(\mathbf{p_{ij}}) \right)^2 + \lambda \int_{\Omega_i} \Delta f_i \left(\bm{p}\right)^2 d\Omega_i\right)
-	\end{split}
-\end{equation}
 \section{Matrices}
 Assuming $W'_i$ and $V'_i$ for $i=1,\dots,m$ full rank, define the following
 matrices:
@@ -50,12 +42,12 @@ equations:
 		-\lambda \tilde{R}_1        & -\lambda \tilde{R}_0
 	\end{bmatrix}
 	\begin{bmatrix}
-		\hat{\mathbf{f}} \\
-		\hat{\mathbf{g}}
+		\hat{\bm{f}} \\
+		\hat{\bm{g}}
 	\end{bmatrix}
 	=
 	\begin{bmatrix}
-		\tilde{\Psi}^T Q\mathbf{z} \\
+		\tilde{\Psi}^T Q\bm{z} \\
 		0
 	\end{bmatrix}
 \end{equation}
@@ -104,9 +96,9 @@ where I recall that $\hat{\bm{f}}_N = \tilde{\Psi} \hat{\bm{f}}$.
 Following the ideas stemmed from the spatio-temporal regression in
 \citeauthor{pollini} \cite{pollini} and \citeauthor{massardi} \cite{massardi},
 we consider an iterative scheme. At each step $i$ the scheme computes an
-approximate solution $(\hat{\mathbf{f}}^{i},\hat{\mathbf{g}}^{i})$ of the
-monolithic system by solving a single-unit problem for each statistical unit.
-The algorithm stops with two possible criteria:
+approximate solution $(\hat{\bm{f}}^{i},\hat{\bm{g}}^{i})$ of the monolithic
+system by solving a single-unit problem for each statistical unit. The
+algorithm stops with two possible criteria:
 \begin{itemize}
 	\item A maximum number of iterations is reached;
 	\item The following two conditions are true. \\
@@ -123,9 +115,8 @@ Looking at the monolithic equation \ref{mono}, the question of how to formulate
 an approximation of the term $\tilde{\Psi}^TQ\tilde{\Psi}$ naturally arises. In
 particular, a suitable block approximation allows to make the estimated field
 $\hat{f}_i$ of statistical unit $i$ independent of the observations in the
-other units, for every unit $i$ ($i = 1 \dots m$).
-
-To this purpose, the following approximation is first considered:
+other units, for every unit $i$ ($i = 1 \dots m$). To this purpose, the
+following approximation is first considered:
 
 \begin{equation}
 	\label{blockdia}
@@ -175,8 +166,8 @@ In such a way we have
 \end{equation}
 
 \subsection{Initialization}
-The inizialization consists in finding a good guess
-$(\hat{\mathbf{f}}^0,\hat{\mathbf{g}}^0)$ to start the algorithm from; for this
+The initialization consists in finding a good guess
+$(\hat{\bm{f}}^0,\hat{\bm{g}}^0)$ to start the algorithm from; for this
 purpose, the following $m$ problems are solved: for $i = 1, \dots, m$ solve
 \begin{equation}
 	\begin{bmatrix}
@@ -184,65 +175,65 @@ purpose, the following $m$ problems are solved: for $i = 1, \dots, m$ solve
 		-\lambda R_1  & -\lambda R_0
 	\end{bmatrix}
 	\begin{bmatrix}
-		\hat{\mathbf{f}}_i^0 \\
-		\hat{\mathbf{g}}_i^0
+		\hat{\bm{f}}_i^0 \\
+		\hat{\bm{g}}_i^0
 	\end{bmatrix}
 	=
 	\begin{bmatrix}
-		\mathbf{u}_i \\
+		\bm{u}_i \\
 		0
 	\end{bmatrix}
 \end{equation}
-where $\mathbf{u}_i$ is the vector whose components are the first $n$
-components of $\tilde{\Psi}^T Q\mathbf{z}$ starting from the $n(i-1) +1$-th
+where $\bm{u}_i$ is the vector whose components are the first $n$
+components of $\tilde{\Psi}^T Q\bm{z}$ starting from the $n(i-1) +1$-th
 component.
 
 \subsection{Iterations}
 The idea behind the iterative scheme is, having a guess of a solution
-$(\hat{\mathbf{f}}^{k-1},\hat{\mathbf{g}}^{k-1})$, to compute a new guess
-$(\hat{\mathbf{f}}^k,\hat{\mathbf{g}}^k)$ by replacing the mutual interaction
-of the system variables corresponding to different units with their contibution
-given by their previous value.\\ For example, the first $n$ equations of the
+$(\hat{\bm{f}}^{k-1},\hat{\bm{g}}^{k-1})$, to compute a new guess
+$(\hat{\bm{f}}^k,\hat{\bm{g}}^k)$ by replacing the mutual interaction of the
+system variables corresponding to different units with their contribution given
+by their previous value.\\ For example, the first $n$ equations of the
 monolithic system \ref{mono} read
 \begin{equation}
 	\begin{bmatrix}
 		\Psi^TQ_{1,1}\Psi & \Psi^TQ_{1,2}\Psi & \dots & \Psi^TQ_{1,m}\Psi & -\lambda R_1^T \\
 	\end{bmatrix}
 	\begin{bmatrix}
-		\hat{\mathbf{f}}_1 \\
-		\hat{\mathbf{f}}_2 \\
-		\vdots             \\
-		\hat{\mathbf{f}}_m \\
-		\hat{\mathbf{g}}_1
+		\hat{\bm{f}}_1 \\
+		\hat{\bm{f}}_2 \\
+		\vdots         \\
+		\hat{\bm{f}}_m \\
+		\hat{\bm{g}}_1
 	\end{bmatrix}
 	=
 	\begin{bmatrix}
-		\mathbf{u}_1
+		\bm{u}_1
 	\end{bmatrix}
 \end{equation}
 where $Q_{i,j}$ indicates block of row $i$ and column $j$ of matrix
 $Q$, which also coincides with $-H_{i,j}$ for $i \neq j$. Substituting
-$\hat{\mathbf{f}}_j$ for $j=1,\dots,m$ with $\hat{\mathbf{f}}_j^{k-1}$, taking
-it to the right-hand side and generalizing, the iterative scheme reads: for $i
-	= 1, \dots, m$ solve
+$\hat{\bm{f}}_j$ for $j=1,\dots,m$ with $\hat{\bm{f}}_j^{k-1}$, taking it to
+the right-hand side and generalizing, the iterative scheme reads: for $i = 1,
+	\dots, m$ solve
 \begin{equation}
 	\begin{bmatrix}
 		\Psi^TQ_i\Psi & -\lambda R_1^T \\
 		-\lambda R_1  & -\lambda R_0
 	\end{bmatrix}
 	\begin{bmatrix}
-		\hat{\mathbf{f}}_i^k \\
-		\hat{\mathbf{g}}_i^k
+		\hat{\bm{f}}_i^k \\
+		\hat{\bm{g}}_i^k
 	\end{bmatrix}
 	=
 	\begin{bmatrix}
-		\mathbf{r}_i \\
+		\bm{r}_i \\
 		0
 	\end{bmatrix}
 \end{equation}
 where
 \begin{equation}
-	\mathbf{r}_i =\mathbf{u}_i -\sum_{\substack{j=1\\ j\neq i}}^m \Psi^TQ_{i,j} \Psi \hat{\mathbf{f}}_j^{k-1}
+	\bm{r}_i =\bm{u}_i -\sum_{\substack{j=1\\ j\neq i}}^m \Psi^TQ_{i,j} \Psi \hat{\bm{f}}_j^{k-1}
 \end{equation}
 
 An estimate of $\bm{\nu}$, $\hat{\bm{\nu}}^i = (\hat{\bm{\beta}}^{\prime i},
@@ -252,8 +243,8 @@ computed at each iteration for the estimation of the functional
 
 \subsection{The iterative method as a preconditioned Richardson method}
 Given a generic preconditioning matrix $P$, calling $\bm{r}_k$ the residual of
-the linear system $A \bm{x} = \bm{b}$ (that is the vector $A \bm{x}_k - \bm{b}$
-)at step $k$, Richardson method (\textit{cf.}, for example,
+the linear system $A \bm{x} = \bm{b}$ (that is the vector $A \bm{x}_k -
+	\bm{b}$) at step $k$, Richardson method (\textit{cf.}, for example,
 \cite{Quarteroni})consists in solving (or rather trying to) the linear system
 iterating the following steps:
 \begin{enumerate}
@@ -285,11 +276,11 @@ to a generalized cross-validation criterion. In particular, as in \cite{sangalli
 \underline{where for $q$, $m$, $p$ we follow the notation of section
 	?}, and S indicates the smoothing matrix, which is the matrix that maps the
 observations vector $\bm{z}$ into the estimated spatial field $\hat{\bm{f}}$
-evaluated at the location of the observations ($\,\hat{\bm{f}}_N =
-	\tilde{\Psi}\hat{\bm{f}} = S z\,$). Its value is
+evaluated at the location of the observations $(\hat{\bm{f}}_N =
+	\tilde{\Psi}\hat{\bm{f}} = S z)$. Its value is
 \begin{equation}
 	S = \tilde{\Psi} \left(\tilde{\Psi}^TQ\tilde{\Psi} + \lambda \tilde{R}_1^T
-	\tilde{R}_0^{-1} \tilde{R}_1\right)^{-1}\tilde{\Psi}^TQ
+	\tilde{R}_0^{-1} \tilde{R}_1\right)^{-1}\tilde{\Psi}^TQ,
 \end{equation}
 and it stems as a Schur complement for system \ref{mono} with respect
 to the estimated field $\hat{\bm{f}}$.\\ The computation of the GCV parameter

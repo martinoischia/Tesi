@@ -58,7 +58,7 @@ to $n_i$, for given patient $i$.\\The variable of interest z, observed at
 $\bm{p}_{ij}$, is modeled as
 \begin{equation}
 	\label{model}
-	z_{ij} = \bm{w}^T_{ij} \bm{\beta} + \bm{v}^T_{ij} \bm{b}_i + f_i(\bm{p_{ij}}) + \epsilon_{ij}.
+	z_{ij} = \bm{w}^T_{ij} \bm{\beta} + \bm{v}^T_{ij} \bm{b}_i + f_i(\bm{p_}{ij}) + \epsilon_{ij}.
 \end{equation}
 The notation utilized represents the following quantities:
 \begin{itemize}
@@ -67,23 +67,173 @@ The notation utilized represents the following quantities:
 	\item $\bm{v}_{ij}$ is the vector of random effects covariates for the observation $z_{ij}$;
 	\item $\bm{b}_i$ is the vector of regression coefficients of the random
 	      effects for patient $i$.
+	\item $f_i$ is the unknown deterministic field defined on domain
+	      $\Omega_i$.
+	\item $\epsilon_{ij}$, for every $i$ and $j$, are the random noise or errors, considered as the realizations of independent identically distributed (i.i.d.) random variables, with mean $0$ and variance $\sigma^2$.
 \end{itemize}
-Since when we are going to estimate the unknown quantities without
-prior knowledge on the field $f$, we are going to assume that the random effect
-$\bm{b_i}$ has average $0$:
+We will assume that the random effect $\bm{b}_i$ has average $0$
 \begin{equation}
-	\sum_{i=1}^{m}{\bm{b_i}}=0.
+	\label{constraint}
+	\sum_{i=1}^{m}{\bm{b}_i}=0:
 \end{equation}
-Let also $N$ be equal to $\sum_{i=1}^{m}n_i$. For every $i$, $j$
-equation \ref{model} constitutes a system of $N$ equations, that is expressed
-concisely in algebraic form in the following equations:
+In fact, if the average was different from 0, we would simply split
+the contribution of those covariates into two, a fixed effect one and a random
+effect with 0 average across groups (more on this in section \ref{repar}). \\
+Let also $N$ be equal to $\sum_{i=1}^{m}n_i$. For every $i$, $j$ equation
+\ref{model} constitutes a system of $N$ equations, that is expressed concisely
+in algebraic form in the following two ways:
 \begin{equation}
-\bm{z}_i = \bm{W}_i \bm{\beta} + \bm{V}_i \bm{b}_i + \bm{f_i} + \bm{\epsilon_i} \quad i=1 \dots m,
+	\begin{cases}
+		\bm{z}_i = W_i \bm{\beta} + \bm{V}_i \bm{b}_i + \bm{f_i} + \bm{\epsilon_i} \quad
+		i=1 \dots m \\
+		\sum_{i=1}^{m}{\bm{b}_i}=0:
+	\end{cases}
 \end{equation}
 \begin{equation}
-	\bm{z} = \bm{W} \bm{\beta} + \bm{V} \bm{b} + \bm{f_N} + \bm\epsilon.
+	\label{unconstrained}
+	\bm{z} = W \bm{\beta} + \bm{V} \bm{b} + \bm{f}_N + \bm\epsilon,
 \end{equation}
+where:
 \begin{itemize}
-	\item $\bm{z}_i \in \R^{n_i}$ is the vector of observed data for patient $i$;
-	\item $W_i$ is the matrix whose element $w_{j,k}$
+	\item $\bm{z}_i \in \R^{n_i}$ is the vector of observed data for patient $i$ and $\bm{z}$ is the vector belonging to $\R^N$ obtained by concatenating the $m$ vectors $\bm{z}_i$;
+	\item $W_i$ is the matrix whose element $w_{j,k}$ is the $k$-th element of previously defined vector $\bm{w}_{ij}$, $\left(\bm{w}_{ij}\right)_k$, whereas $W$ is a concatenation as well
+	      \begin{equation}
+		      W=
+		      \begin{bmatrix*}
+			      W_1\\
+			      \vdots\\
+			      W_m
+		      \end{bmatrix*}
+		      ;
+	      \end{equation}
+	\item $V_i$ is the matrix whose element $v_{j,k}$ is the $k$-th
+	      element of previously defined vector $\bm{v}_{ij}$,
+	      $\left(\bm{v}_{ij}\right)_k$; \item when moving to the $N$ system of equations,
+	      we include constraint \ref{constraint} by defining $\bm{b}$ as the
+	      concatenation of $m-1$ vectors $\bm{b}_i$, omitting the last one
+	      \begin{equation}
+		      \bm{b}=
+		      \begin{bmatrix*}
+			      \bm{b}_1\\
+			      \vdots\\
+			      \bm{b}_{m-1}
+		      \end{bmatrix*}
+	      \end{equation}
+	      and defining $V$ in the following manner:
+	      \begin{equation}
+		      V=
+		      \begin{bmatrix*}
+			      V_1 & 0 & 0 & 0\\
+			      0 & V_2 & 0 & 0\\
+			      \vdots & 0 & \ddots & \vdots\\
+			      0 & 0 & 0 & V_{m-1}\\
+			      -V_m & -V_m & -V_m & -V_m
+		      \end{bmatrix*}
+		      ;
+	      \end{equation}
+	\item $\bm{f}_i \in \R^{n_i}$ is the vector of observed data for
+	      patient $i$ and $\bm{f}_N$ is the vector belonging to $\R^N$ obtained by
+	      concatenating the $m$ vectors $\bm{f}_i$; \item $\bm{\epsilon}_i \in \R^{n_i}$
+	      is the vector of errors for patient $i$ and $\bm{\epsilon}_N$ is the vector
+	      belonging to $\R^N$ obtained by concatenating the $m$ vectors
+	      $\bm{\epsilon}_i$;
 \end{itemize}
+\section{Reparametrizing the model}\label{repar}
+The $N$ system of equations \ref{unconstrained} is the model written in an
+unconstrained form, where the constraint \ref{constraint} has been “injected”
+into the design matrix. We also call it \textit{official parametrization} of
+the mixed-effects model.
+
+As described in \cite{kim} we prefer to adopt a slightly different approach,
+mainly for computational efficiency reasons. In the following we will assume
+that all covariates contribute to the fixed effect part of the model, whereas a
+subset of them will contribute to the random effect part. We will refer to this
+version of the model as the \textit{implementation} one.
+
+\textit{Implementation} version is expressed by the following system:
+\begin{equation}
+	\bm{z}=W' \bm{\beta}' +V'\bm{b}' +\bm{f}_N + \bm{\epsilon},
+\end{equation}
+where we have used the following new quantities:
+\begin{itemize}
+	\item $W'$, similarly as before, is concatenation of $W_i'$ matrices, where $W_i'$ is composed of the covariates related only to fixed effects, meaning with no patient-specific contribution.
+	      \begin{equation}
+		      W'=
+		      \begin{bmatrix*}
+			      W_1'\\
+			      W_2'\\
+			      \vdots\\
+			      W'_{m}
+		      \end{bmatrix*}
+		      ;
+	      \end{equation}
+	\item $\bm{\beta}'$ is the coefficient relative to covariates for
+	      fixed effects, as just described; \item $V'$ is composed of $V_i'$ matrices,
+	      which are the matrices of covariates having also a random effect. Unlike
+	      previous $V$, $V'$ does not include the part deriving from constraint
+	      \ref{constraint}:
+	      \begin{equation}
+		      V'=
+		      \begin{bmatrix*}
+			      V_1' & 0 & 0 & 0\\
+			      0 & V_2' & 0 & 0\\
+			      \vdots & 0 & \ddots & \vdots\\
+			      0 & 0 & 0 & V_{m}'
+		      \end{bmatrix*}
+	      \end{equation}
+	\item $\bm{b}'$ is the regression coefficient relative to the
+	      covariates with patient-specific effect;
+\end{itemize}
+Let us also use the following notation, which allows us to properly
+refer to sizes of vectors and matrices defined before. We indicate with $q$ the
+number of covariates, and with $p$ the number of covariates with
+patient-specific interest. Therefore the number of covariates considered just
+for their fixed effect contribution is $q-p$.
+
+Vector $\bm{b}'$ belongs to $\R^{mp}$, $\bm{\beta}'$ to $\R^{q-p}$ and we can
+relate it to previously defined vectors $\bm{\beta}$, $\bm{b}$ ($\in \R^q$ and
+$\R^{m(p-1)}$ respectively), by defining $\bm{\beta}^* \in \R^p$, average of
+random effects coefficients
+\begin{equation}
+	\bm{\beta}^*=\frac{\sum_{i=1}^{m}\bm{b}'_i}{m}.
+\end{equation}
+In this way $\bm{\beta}$ is just the concatenation of $\bm{\beta}'$
+and $\bm{\beta}^*$ while for $\bm{b}$ holds the following:
+\begin{equation}
+	\bm{b}=
+	\begin{bmatrix}
+		\bm{b}_1 \\
+		\bm{b}_2 \\
+		\vdots   \\
+		\bm{b}_{m-1}
+	\end{bmatrix}
+	=
+	\begin{bmatrix}
+		\bm{b}_1' -\bm{\beta}^* \\
+		\bm{b}_2' -\bm{\beta}^* \\
+		\vdots                  \\
+		\bm{b}_{m-1}' -\bm{\beta}^*
+	\end{bmatrix}
+\end{equation}
+\section{Estimation problem}
+Similarly to what happens with every SR-PDE model, we estimate the unknown
+quantities of the model by minimization of the following functional (we limit
+ourselves to consider the Laplacian as a differential operator for simplicity):
+\begin{equation}
+	\label{functional2}
+	\begin{split}
+		J_{\Omega_i, \lambda} \left(\bm{\beta}', \bm{b}', f_1, \dots, f_m \right) = \\
+		\sum_{i = 1}^m \left( z_{i}- {\bm{w}'_{i}}^T \bm{\beta'} - {\bm{v}_{i}'}^T \bm{b}'_i
+		- f_i(\bm{p}_{ij}) \right)^2 + \lambda \int_{\Omega_i} \Delta f_i \left(\bm{p}\right)^2 d\Omega_i
+	\end{split}
+\end{equation}
+\begin{equation}
+	\label{functional}
+	\begin{split}
+		J_{\Omega_i, \lambda} \left(\bm{\beta}', \bm{b}'_1, \dots, \bm{b}'_m, f_1, \dots, f_m \right) = \\ \sum_{i = 1}^m \left( \sum_{j=1}^{n_i} \left( z_{ij}-{\bm{w}'_{ij}}^T \bm{\beta}' - {\bm{v}'_{ij}}^T \bm{b}'_i - f_i(\bm{p_{ij}}) \right)^2 + \lambda \int_{\Omega_i} \Delta f_i \left(\bm{p}\right)^2 d\Omega_i\right)
+	\end{split}
+\end{equation}
+Notice that the unknown field must not satisfy the differential
+equation but contributes to the functional with the square of the misfit from
+the equation itself (besides its contribution in terms of distance from the
+data at observed locations).
