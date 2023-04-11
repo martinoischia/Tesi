@@ -4,32 +4,32 @@
 \input{mat-polimi.tex}
 
 \begin{document}
-    \input{0-front/1-titlepage.tex}
-    \input{0-front/2-titleback.tex}
+\input{0-front/1-titlepage.tex}
+\input{0-front/2-titleback.tex}
 
-    \cleardoublepage
-    \phantomsection % Fix PDF link to TOC.
-    \pdfbookmark{\contentsname}{toc}
-    \tableofcontents
+\cleardoublepage
+\phantomsection % Fix PDF link to TOC.
+\pdfbookmark{\contentsname}{toc}
+\tableofcontents
 
-    \listoffigures
+\listoffigures
 
-    %
-    \input{0-front/3-abstract.tex}
-    \input{0-front/4-sommario.tex}
-    % \input{0-front/5-acknowledgments.tex}
+%
+\input{0-front/3-abstract.tex}
+\input{0-front/4-sommario.tex}
+% \input{0-front/5-acknowledgments.tex}
 
-    %
-    \input{1-main/1-synopsis.tex}
-    \input{1-main/1.1-introduction.tex}
-    \input{1-main/2-my_chapter.tex}
-    \input{1-main/2-zinference.tex}
-    \input{1-main/3-simulations.tex}
-    \input{1-main/4-applications.tex}
-    \input{1-main/5-conclusions.tex}
-    \begin{appendices}
-    \input{2 - appendix/formulae.tex}
-    \end{appendices}
+%
+\input{1-main/1-synopsis.tex}
+\input{1-main/1.1-introduction.tex}
+\input{1-main/2-largesolver.tex}
+\input{1-main/2-zinference.tex}
+\input{1-main/3-simulations.tex}
+\input{1-main/4-applications.tex}
+\input{1-main/5-conclusions.tex}
+\begin{appendices}
+	\input{2 - appendix/formulae.tex}
+\end{appendices}
 
-    \printbibliography[heading=bibintoc, title={Bibliography}]
+\printbibliography[heading=bibintoc, title={Bibliography}]
 \end{document}

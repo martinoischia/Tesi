@@ -19,7 +19,7 @@
 
 % Only edit this file if you are aware of what you are doing.
 \documentclass[12pt, a4paper, listof=totoc,
-               headinclude, footinclude, cleardoublepage=empty]{scrbook}
+	headinclude, footinclude, cleardoublepage=empty]{scrbook}
 
 % Generic template options.
 \setcounter{secnumdepth}{3} % Number subsubsections.
@@ -35,11 +35,9 @@
 \DeclareTOCStyleEntry[dynnumwidth]{tocline}{figure} % Dynamic label width in list of figures.
 \usepackage[toc,page]{appendix}
 
-
 % Bibliography.
 \usepackage[backend=biber, style=alphabetic, hyperref, backref, maxnames=10, maxcitenames=3, giveninits=true]{biblatex}
 \addbibresource{references.bib}
-
 
 % Standard math packages.
 \usepackage{amsmath, amsthm}
@@ -56,9 +54,8 @@
 \newtheorem{theorem}{Theorem}[chapter]
 \newtheorem{proposition}{Proposition}[chapter]
 
- % For braced-style systems of equations.
+% For braced-style systems of equations.
 \usepackage[overload]{empheq}
-
 
 % Graphics packges.
 % Put your images under the "images/" subdirectory.
@@ -66,7 +63,7 @@
 \graphicspath{{images/}}
 
 % Numbered and caption subfigures using \subfloat.
-\usepackage{subfig}
+\usepackage{subcaption}
 
 % A package for high-quality hand-made figures.
 \usepackage{tikz}
@@ -75,10 +72,8 @@
 % Enhances the features of the standard "table" and "tabular" environments.
 \usepackage{tabularx}
 
-
 % Pseudo-code algorithm descriptions.
 \usepackage{algorithm2e}
-
 
 % Cross-references style.
 % Use \cref for generating automatic reference keywords:
@@ -88,10 +83,11 @@
 \usepackage{cleveref}
 \usepackage[numbered]{bookmark} % Number PDF bookmarks.
 \usepackage{enumitem}
-
+\setlist[itemize]{leftmargin=*}
 % Useful commands.
 \newcommand{\dd}{\,\mathrm{d}}
 \newcommand{\eg}{\textit{e.g.}\ }
+\newcommand{\cf}{\textit{c.f.}\ }
 \newcommand{\ie}{\textit{i.e.}\ }
 
 % \abs{x} = |x|
@@ -101,8 +97,7 @@
 % Total derivative \tdev{f}{t} = df/dt.
 \newcommand{\tdev}[2]{\frac{\mathrm{d}#1}{\mathrm{d}#2}}
 % Partial derivative \pdev{f}{t}.
-\newcommand{\pdev}[2]{\frac{\partial#1}{\partial#2}}
-
+\newcommand{\pdev}[2]{\frac{\partial#1}{\partial#2}} \DeclareMathOperator*{\argmin}{arg\,min}
 
 % Set here custom margins.
 \usepackage{geometry}

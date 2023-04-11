@@ -3,61 +3,70 @@
 \label{sec:wood}
 The following matrix identity holds.
 \begin{proposition}[Woodbury matrix identity]
-    Let $M$ be a square $m\times m$ matrix which can be written as the sum $E+UCV$, with E being $m \times m$, $U$ being $m\times n$, $C$ being a square $n\times n$ matrix, and $V$ $n\times m$. Then
-    \begin{equation}
-        \label{wood}
-        M^{-1}=
-        \left(E + UCV \right)^{-1} = E^{-1} - E^{-1}U\left(C^{-1} + V E^{-1}U\right)^{-1}V E^{-1}
-    \end{equation}
+	Let $M$ be a square $m\times m$ matrix which can be written as the sum $E+UCV$, with E being $m \times m$, $U$ being $m\times n$, $C$ being a square $n\times n$ matrix, and $V$ $n\times m$. Then
+	\begin{equation}
+		\label{wood}
+		M^{-1}=
+		\left(E + UCV \right)^{-1} = E^{-1} - E^{-1}U\left(C^{-1} + V E^{-1}U\right)^{-1}V E^{-1}
+	\end{equation}
 \end{proposition}
 
-In particular, in the case where inverting matrix $E$ can be considered cheap or useful, on the righ-hand side solving the system involves solving an $n\times n$ system (the one carachterized by matrix $C^{-1} + V E^{-1}U$), whilst on the left the dimensions are $m\times m$.\\
-This equation is exploited for faster system solving in the \verb|fdaPDE| library. As an example, consider the space-only problem, described \eg in \cite{sangalli}: the presence of covariates leads to a linear system involving the following matrix $M$:
+In particular, in the case where inverting matrix $E$ can be considered cheap
+or useful, on the righ-hand side solving the system involves solving an
+$n\times n$ system (the one carachterized by matrix $C^{-1} + V E^{-1}U$),
+whilst on the left the dimensions are $m\times m$.\\ This equation is exploited
+for faster system solving in the \verb|fdaPDE| library. As an example, consider
+the space-only problem, described \eg in \cite{sangalli1}: the presence of
+covariates leads to a linear system involving the following matrix $M$:
 \begin{equation*}
-    M =
-    \begin{bmatrix}
-        \Psi^TQ\Psi & -\lambda R_1^T\\
-        -\lambda R_1  & -\lambda R_0
-    \end{bmatrix}
-\end{equation*}
-Remembering that the projection matrix Q is defined as $I-H$, $M$ can be split into the following two components, one independent from $\lambda$:
+	M =
+	\begin{bmatrix}
+		\Psi^TQ\Psi  & -\lambda R_1^T \\
+		-\lambda R_1 & -\lambda R_0
+	\end{bmatrix}
+\end{equation*} Remembering that the projection matrix Q is defined as $I-H$, $M$
+can be split into the following two components, one independent from $\lambda$:
 \begin{equation*}
-    M =
-    \begin{bmatrix}
-        \Psi^T\Psi & -\lambda R_1^T\\
-        -\lambda R_1  & -\lambda R_0
-    \end{bmatrix}
-    +
-    \begin{bmatrix}
-        -\Psi^TH\Psi & 0\\
-        0 & 0
-    \end{bmatrix}
-\end{equation*}
-By defining $E$ the left matrix of the two above (which is also the matrix corresponding to the problem without covariates), and remembering that $H = W\left(W^TW\right)^{-1}W^T$, Woodbury decomposition can be exploited defining the following matrices $U, C, V$:
-\begin{equation*}     
-    \begin{bmatrix}
-        -\Psi^TW\left(W^TW\right)^{-1}W^T\Psi & 0\\
-        0 & 0
-    \end{bmatrix} = UCV
-\end{equation*}
+	M =
+	\begin{bmatrix}
+		\Psi^T\Psi   & -\lambda R_1^T \\
+		-\lambda R_1 & -\lambda R_0
+	\end{bmatrix}
+	+
+	\begin{bmatrix}
+		-\Psi^TH\Psi & 0 \\
+		0            & 0
+	\end{bmatrix}
+\end{equation*} By defining $E$ the left matrix of the two above (which is also the
+matrix corresponding to the problem without covariates), and remembering that
+$H = W\left(W^TW\right)^{-1}W^T$, Woodbury decomposition can be exploited
+defining the following matrices $U, C, V$:
 \begin{equation*}
-    U = 
-    \begin{bmatrix}
-        \Psi^TW\\
-        0
-    \end{bmatrix}
-\end{equation*}
-\begin{equation*}
-    C = -
-    \begin{bmatrix}
-        \left(W^TW\right)^{-1}
-    \end{bmatrix}
+	\begin{bmatrix}
+		-\Psi^TW\left(W^TW\right)^{-1}W^T\Psi & 0 \\
+		0                                     & 0
+	\end{bmatrix}
+	= UCV
 \end{equation*}
 \begin{equation*}
-    V = U^T =
-    \begin{bmatrix}
-        W^T\Psi & 0
-    \end{bmatrix}
+	U =
+	\begin{bmatrix}
+		\Psi^TW \\
+		0
+	\end{bmatrix}
 \end{equation*}
-where the $0s$ indicate matrices of zeros of suitable dimensions.\\
-Since matrices $U, C, V$ do not depend on $\lambda$, computing the solution of the system for different values of $\lambda$ involves only the factorization of the matrix $E$ (and the cheaper $C^{-1} + V E^{-1}U$).
+\begin{equation*}
+	C = -
+	\begin{bmatrix}
+		\left(W^TW\right)^{-1}
+	\end{bmatrix}
+\end{equation*}
+\begin{equation*}
+	V = U^T =
+	\begin{bmatrix}
+		W^T\Psi & 0
+	\end{bmatrix}
+\end{equation*} where the $0s$ indicate matrices of zeros of suitable dimensions.\\
+Since matrices $U, C, V$ do not depend on $\lambda$, computing the solution of
+the system for different values of $\lambda$ involves only the factorization of
+the matrix $E$ (and the cheaper $C^{-1} + V E^{-1}U$).
