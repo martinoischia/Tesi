@@ -1,0 +1,227 @@
+% !TEX root = ../thesis.tex
+
+\chapter{Solving large linear systems for the mixed-effects model}
+\label{ch:chapter_name}
+\section{Iterative methods}
+
+Following the ideas stemmed from the spatio-temporal regression in
+\citeauthor{pollini} \cite{pollini} and \citeauthor{massardi} \cite{massardi},
+we consider an iterative scheme. At each step $i$ the scheme computes an
+approximate solution $(\hat{\bm{f}}^{i},\hat{\bm{g}}^{i})$ of the monolithic
+system by solving a single-unit problem for each statistical unit. The
+algorithm stops with two possible criteria:
+\begin{itemize}
+	\item[--]A maximum number of iterations is reached; \item[--] The following two
+		conditions are true. \\ The first one is that the functional \ref{functional}
+		evaluated in the estimated solution $J^i = J_{\Omega_i, \lambda}\left(
+			\hat{\bm{\beta}}^{\prime i}, \hat{\bm{b}}^{\prime i}_1, \dots,
+			\hat{\bm{b}}^{\prime i}_m, \hat{f}_1^i, \dots, \hat{f}_m^i \right)$ has reached
+		stagnation, that is the relative increment $\left( J^i - J^{i-1}\right) / J^i$
+		is below a certain threshold. In the code such threshold is an input parameter,
+		it was set to $10^{-8}$. The term $ \int_{\Omega_i} \Delta f_i
+			\left(\bm{p}\right)^2 d\Omega_i $ of the functional \ref{functional} is easily
+		computed by exploiting the expansion into the finite element basis functions:
+		it is equal to $\hat{\bm{g}}_i^T R_0 \hat{\bm{g}}_i$, where $\hat{\bm{g}}_i $
+		is the sub-vector of $\hat{\bm{g}}$ corresponding to unit $i$.\\ The second one
+		is that the estimated solution is close to the exact solution of the system
+		\ref{mono}. This condition is verified by checking that the residual,
+		normalized by the Euclidean norm of the right-hand side, is below a certain
+		threshold (this is another input parameter, $10^{-8}$ was used).
+\end{itemize}
+The details of the method that was implemented are described in the
+following sections.
+
+\subsection{The block diagonal approximation}
+\label[subsection]{iter}
+
+Looking at the monolithic equation \ref{mono}, the question of how to formulate
+an approximation of the term $\tilde{\Psi}^TQ\tilde{\Psi}$ naturally arises. In
+particular, a suitable block approximation allows to make the estimated field
+$\hat{f}_i$ of statistical unit $i$ independent of the observations in the
+other units, for every unit $i$ ($i = 1 \dots m$). To this purpose, the
+following approximation is considered:
+
+\begin{equation}
+	\label{blockdia}
+	\tilde{\Psi}^TQ\tilde{\Psi}\simeq \Gamma :=
+	\begin{bmatrix}
+		\Psi^TQ_1\Psi & 0             & \dots  & 0             \\
+		0             & \Psi^TQ_2\Psi & \ddots & \vdots        \\
+		\vdots        & \ddots        & \ddots & 0             \\
+		0             & \dots         & 0      & \Psi^TQ_m\Psi \\
+	\end{bmatrix}
+	,
+\end{equation}
+where $Q_i$ indicates the $i$-th diagonal block of $Q$, of dimensions
+$n \times n$. By definition of $Q$, this is equal to
+$I_n-X_i\left(X^TX\right)^{-1}X_i^T$, with $X_i=X\left(\left(i-1\right)n+1 :
+	in\,, \;:\; \right)$, where the typical notation of MATLAB language has been
+used to express a suitable submatrix.\\ This choice is not casual but it
+naturally stems from the idea behind the iterative method as we will see in
+section \ref{iterburocratico}. Not only: $\Psi^TQ_i\Psi$ is also the $i$-th
+diagonal block of matrix $\tilde{\Psi}^TQ\tilde{\Psi}$. We will show it, for
+example, by means of Woodbury decomposition (appendix \ref{sec:wood}) as used
+in \ref{eq:wootilde}.
+
+Express $\tilde{\Psi}^TQ\tilde{\Psi}$ as
+$\tilde{\Psi}^T\tilde{\Psi}-\tilde{\Psi}^TH\tilde{\Psi}$. Thus, defining $U =
+	\tilde{\Psi}^TX$, $C = -\left(X^TX\right)^{-1}$,$V =U^T$, its $i$-th diagonal
+block is equal to $\Psi^T\Psi + U_iCV_i $, where
+\begin{equation}
+	\begin{split}
+		U_i = U\left(\left(i-1\right)N_\mathcal{T}+1 : iN_\mathcal{T}\,, \;:\;\right) = \tilde{\Psi}^T_iX =\\
+		\begin{bmatrix}
+			0 & \dots & 0 & \Psi^T & 0 & \dots & 0
+		\end{bmatrix}
+		\begin{bmatrix}
+			X_1    \\
+			\vdots \\
+			X_i    \\
+			\vdots \\
+			X_m
+		\end{bmatrix}
+		= \Psi^T X_i,
+	\end{split}
+\end{equation}
+\begin{equation}
+	V_i = U_i^T = X^T_i\Psi.
+\end{equation}
+Thus, obtaining what we wanted to prove,
+\begin{equation}
+	\Psi^T\Psi +  U_iCV_i = \Psi^T \left( I_n-X_i\left(X^TX\right)^{-1}X_i^T \right) \Psi = \Psi^T Q_i \Psi.
+\end{equation}
+
+\subsection{Initialization}
+The initialization consists in finding a good guess
+$(\hat{\bm{f}}^0,\hat{\bm{g}}^0)$ to start the algorithm from; for this
+purpose, the following $m$ problems are solved: for $i = 1, \dots, m$ solve
+\begin{equation}
+	\begin{bmatrix}
+		\Psi^TQ_i\Psi & -\lambda R_1^T \\
+		-\lambda R_1  & -\lambda R_0
+	\end{bmatrix}
+	\begin{bmatrix}
+		\hat{\bm{f}}_i^0 \\
+		\hat{\bm{g}}_i^0
+	\end{bmatrix}
+	=
+	\begin{bmatrix}
+		\bm{u}_i \\
+		0
+	\end{bmatrix}
+	,
+\end{equation}
+where $\bm{u}_i$ is the vector whose components are the first $n$
+components of $\tilde{\Psi}^T Q\bm{z}$ starting from the $n(i-1) +1$-th
+component.
+
+\subsection{Iterations}
+\label{iterburocratico}
+The idea behind the iterative scheme is, having a guess of a solution
+$(\hat{\bm{f}}^{k-1},\hat{\bm{g}}^{k-1})$, to compute a new guess
+$(\hat{\bm{f}}^k,\hat{\bm{g}}^k)$ by replacing inside the monolithic system
+\ref{mono} the unknown coefficients relative to all but one unit, with their
+value computed at previous step, for every unit.
+
+For example, the first $n$ equations of the monolithic system \ref{mono} read
+\begin{equation}
+	\begin{bmatrix}
+		\Psi^TQ_{1,1}\Psi & \Psi^TQ_{1,2}\Psi & \dots & \Psi^TQ_{1,m}\Psi & -\lambda R_1^T \\
+	\end{bmatrix}
+	\begin{bmatrix}
+		\hat{\bm{f}}_1 \\
+		\hat{\bm{f}}_2 \\
+		\vdots         \\
+		\hat{\bm{f}}_m \\
+		\hat{\bm{g}}_1
+	\end{bmatrix}
+	=
+	\begin{bmatrix}
+		\bm{u}_1
+	\end{bmatrix}
+	,
+\end{equation}
+where $Q_{i,j}$ indicates block of row $i$ and column $j$ of matrix
+$Q$. Substituting $\hat{\bm{f}}_j$ for $j \neq 1$ with $\hat{\bm{f}}_j^{k-1}$,
+taking previous step values to the right-hand side and generalizing, the
+iterative scheme reads: for $i = 1, \dots, m$ solve
+\begin{equation}
+	\begin{bmatrix}
+		\Psi^TQ_i\Psi & -\lambda R_1^T \\
+		-\lambda R_1  & -\lambda R_0
+	\end{bmatrix}
+	\begin{bmatrix}
+		\hat{\bm{f}}_i^k \\
+		\hat{\bm{g}}_i^k
+	\end{bmatrix}
+	=
+	\begin{bmatrix}
+		\bm{r}_i \\
+		0
+	\end{bmatrix}
+\end{equation}
+where
+\begin{equation}
+	\bm{r}_i =\bm{u}_i -\sum_{\substack{j=1\\ j\neq i}}^m \Psi^TQ_{i,j} \Psi \hat{\bm{f}}_j^{k-1}
+\end{equation}
+
+An estimate of $\bm{\nu}$, $\hat{\bm{\nu}}^i = (\hat{\bm{\beta}}^{\prime i},
+	\hat{\bm{b}}_1^{\prime i}, \dots, \hat{\bm{b}}_m^{\prime i})$ has to be
+computed at each iteration for the estimation of the functional
+\ref{functional}, according to equation \ref{nu}.
+
+\subsection{The iterative method as a preconditioned Richardson method}
+Given a generic preconditioning matrix $P$, calling $\bm{r}_k$ the residual of
+the linear system $A \bm{x} = \bm{b}$ (that is the vector $A \bm{x}_k -
+	\bm{b}$) at step $k$, Richardson method (\textit{cf.}, for example,
+\cite{Quarteroni})consists in solving (or rather trying to) the linear system
+iterating the following steps:
+\begin{enumerate}
+	\item Solve $P \bm{z}_k = \bm{r}_k$
+	\item Compute the acceleration parameter $\alpha_k$ (for simplicity we use $\alpha_k = 1$)
+	\item Update the solution $ \bm{x}_{k+1} = \bm{x}_{k} - \alpha_k \bm{z}_k $
+	\item Update the residual $\bm{r}_{k+1} = \bm{r}_{k} - \alpha_k A \bm{z}_k$
+\end{enumerate}
+
+The iterative scheme described in the previous section is a Richardson scheme
+with the following preconditioning matrix:
+\begin{equation}
+	\label{precond}
+	P=
+	\begin{bmatrix}
+		\Gamma               & -\lambda \tilde{R}_1^T \\
+		-\lambda \tilde{R}_1 & -\lambda \tilde{R}_0
+	\end{bmatrix}
+\end{equation}
+Solving a large linear system involving this matrix is indeed like
+solving $m$ linear systems of dimensions $2n\times 2n$.
+\section{Generalized cross validation}
+Problem \ref{mono} is solved multiple times on a grid of $\lambda s$. The best
+$\lambda$ is then chosen according to a generalized cross-validation criterion.
+In particular, as in \cite{sangalli1}, the minimum of the generalized
+cross-validation (GCV) parameter is used as a model selection criterion. The
+generalization of this parameter to the mixed-effect model reads as follows:
+\begin{equation}
+	\label{GCV}
+	GCV(\lambda) = \frac{1}{N\left(1-\left(q-p+mp+tr\left(S\right)\right)/N\right)^2}\norm{\bm{z} - \hat{\bm{z}}}^2
+\end{equation}
+where for $q$, $m$, $p$ we follow the notation of section
+\ref{repar}, and S indicates the smoothing matrix, which is the matrix that
+maps the observations vector $\bm{z}$ into the estimated spatial field
+$\hat{\bm{f}}$ evaluated at the location of the observations $(\hat{\bm{f}}_N =
+	\tilde{\Psi}\hat{\bm{f}} = S z)$. Its value is
+\begin{equation}
+	S = \tilde{\Psi} \left(\tilde{\Psi}^TQ\tilde{\Psi} + \lambda \tilde{R}_1^T
+	\tilde{R}_0^{-1} \tilde{R}_1\right)^{-1}\tilde{\Psi}^TQ,
+\end{equation}
+and it stems as a Schur complement for system \ref{mono} with respect
+to the estimated field $\hat{\bm{f}}$.\\ The computation of the GCV parameter
+\ref{GCV} involves the expensive computation of the trace of the smoothing
+matrix $S$. Since for any two matrices $A$ and $B$ such that the product $AB$
+is defined, it holds that $tr\left(AB\right) = tr\left(BA\right)$, the trace of
+$S$ can be computed as the trace of
+\begin{equation}
+	\tilde{S} = \left(\tilde{\Psi}^TQ\tilde{\Psi} + \lambda \tilde{R}_1^T
+	\tilde{R}_0^{-1} \tilde{R}_1\right)^{-1}\tilde{\Psi}^TQ \tilde{\Psi}.
+\end{equation}
+
