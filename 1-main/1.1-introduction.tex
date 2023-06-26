@@ -42,20 +42,21 @@ mixed-models are used is in clinical data, where data of several patients are
 measured in the same area of the body. For example in chapter
 \ref{ch:Applications} \nameref{ch:Applications}, we will see a mixed-effects
 model applied to human brain data, collected on a set of patients who undertook
-functional Magnetic Resonance Imaging (fMRI).\\ For this reason in the
-following we will use the word \textit{patients} to indicate the different
-groups of our generic mixed-effects model.
+functional Magnetic Resonance Imaging (fMRI).\\ We will denote as statistical
+unit the entity being observed that induces the grouping structure: in the just
+mentioned clinical example, the statistical units are the different patients
+being observed.
 
 We are therefore ready to present, similarly as in \cite{kim}, the SR-PDE
 mixed-effects model.
 
 \section{Generic SR-PDE mixed-effects model}
 
-Consider $m$ patients. To the $i$-th patient, with $i$ varying from 1 to m,
-corresponds a unique spatial domain $\Omega_i$, on which we observe $n_i$ data
-at different positions $\bm{p}_{ij}$. Index $j$ is therefore varying from $1$
-to $n_i$, for given patient $i$.\\The variable of interest z, observed at
-$\bm{p}_{ij}$, is modeled as
+Consider $m$ statistical units. To the $i$-th unit, with $i$ varying from 1 to
+m, corresponds a unique spatial domain $\Omega_i$, on which we observe $n_i$
+data at different positions $\bm{p}_{ij}$. Index $j$ is therefore varying from
+$1$ to $n_i$, for given statistical unit $i$.\\The variable of interest z,
+observed at $\bm{p}_{ij}$, is modeled as
 \begin{equation}
 	\label{model}
 	z_{ij} = \bm{w}^T_{ij} \bm{\beta} + \bm{v}^T_{ij} \bm{b}_i + f_i(\bm{p_}{ij}) + \epsilon_{ij}.
@@ -66,11 +67,11 @@ The notation used represents the following quantities:
 		observation $z_{ij}$; \item[--] $\bm{\beta}$ is the vector of regression
 		coefficients for fixed effects; \item[--] $\bm{v}_{ij}$ is the vector of random
 		effects covariates for the observation $z_{ij}$; \item[--] $\bm{b}_i$ is the
-		vector of regression coefficients of the random effects for patient $i$;
-	\item[--] $f_i$ is the unknown deterministic field defined on domain
-		$\Omega_i$; \item[--] $\epsilon_{ij}$, for every $i$ and $j$, are the random
-		noise or errors, considered as the realizations of independent identically
-		distributed (i.i.d.) random variables, with mean $0$ and variance $\sigma^2$.
+		vector of regression coefficients of the random effects for unit $i$; \item[--]
+		$f_i$ is the unknown deterministic field defined on domain $\Omega_i$;
+	\item[--] $\epsilon_{ij}$, for every $i$ and $j$, are the random noise or
+		errors, considered as the realizations of independent identically distributed
+		(i.i.d.) random variables, with mean $0$ and variance $\sigma^2$.
 \end{itemize}
 We will assume that the random effect $\bm{b}_i$ has average $0$
 \begin{equation}
@@ -85,7 +86,7 @@ For every $i$, $j$ equation \ref{model} constitutes a system of $N$ equations,
 that is expressed concisely in algebraic form in the following two ways:
 \begin{equation}
 	\begin{cases}
-		\bm{z}_i = W_i \bm{\beta} + \bm{V}_i \bm{b}_i + \bm{f_i} + \bm{\epsilon_i} \qquad
+		\bm{z}_i = W_i \bm{\beta} + V_i \bm{b}_i + \bm{f_i} + \bm{\epsilon_i} \qquad
 		i=1\dots m \\
 		\sum_{i=1}^{m}{\bm{b}_i}=0
 	\end{cases}
@@ -93,14 +94,18 @@ that is expressed concisely in algebraic form in the following two ways:
 and
 \begin{equation}
 	\label{unconstrained}
-	\bm{z} = W \bm{\beta} + \bm{V} \bm{b} + \bm{f}_N + \bm\epsilon.
+	\bm{z} = W \bm{\beta} + V \bm{b} + \bm{f}_N + \bm\epsilon,
 \end{equation}
-Describing each corresponding term in the two equations:
+in which the corresponding terms in the two equations have the
+following meanings:
 \begin{itemize}
-	\item[--] $\bm{z}_i \in \R^{n_i}$ is the vector of observed data for patient
-		$i$ and $\bm{z}$ is the vector belonging to $\R^N$ obtained by concatenating
-		the $m$ vectors $\bm{z}_i$; \item[--] $W_i$ is the matrix whose element
-		$w_{j,k}$ is the $k$-th element of previously defined vector $\bm{w}_{ij}$,
+	%	\item[--]
+	%		\listvalues
+	\item[--] $\bm{z}_i \in \R^{n_i}$ is the vector of observed data for unit $i$
+		and $\bm{z}$ is the vector belonging to $\R^N$ obtained by concatenating the
+		$m$ vectors $\bm{z}_i$;
+	\item[--] $W_i$ is the matrix whose element $w_{j,k}$
+		is the $k$-th element of previously defined vector $\bm{w}_{ij}$,
 		$\left(\bm{w}_{ij}\right)_k$, whereas $W$ is a concatenation as well
 		\begin{equation}
 			W=
@@ -113,7 +118,8 @@ Describing each corresponding term in the two equations:
 		\end{equation}
 	\item[--] $V_i$ is the matrix whose element $v_{j,k}$ is the $k$-th
 		element of previously defined vector $\bm{v}_{ij}$,
-		$\left(\bm{v}_{ij}\right)_k$; \item[--] when moving to the $N$ system of
+		$\left(\bm{v}_{ij}\right)_k$;
+	\item[--] when moving to the $N$ system of
 		equations, we include constraint \ref{constraint} by defining $\bm{b}$ as the
 		concatenation of $m-1$ vectors $\bm{b}_i$, omitting the last one
 		\begin{equation}
@@ -137,9 +143,10 @@ Describing each corresponding term in the two equations:
 			;
 		\end{equation}
 	\item[--] $\bm{f}_i \in \R^{n_i}$ is the vector of observed data for
-		patient $i$ and $\bm{f}_N$ is the vector belonging to $\R^N$ obtained by
-		concatenating the $m$ vectors $\bm{f}_i$; \item[--] $\bm{\epsilon}_i \in
-			\R^{n_i}$ is the vector of errors for patient $i$ and $\bm{\epsilon}_N$ is the
+		unit $i$ and $\bm{f}_N$ is the vector belonging to $\R^N$ obtained by
+		concatenating the $m$ vectors $\bm{f}_i$;
+	\item[--] $\bm{\epsilon}_i \in
+			\R^{n_i}$ is the vector of errors for unit $i$ and $\bm{\epsilon}_N$ is the
 		vector belonging to $\R^N$ obtained by concatenating the $m$ vectors
 		$\bm{\epsilon}_i$.
 \end{itemize}
@@ -163,7 +170,7 @@ where we have used the following new quantities:
 \begin{itemize}
 	\item[--] $W'$, similarly as before, is concatenation of $W_i'$ matrices, where
 		$W_i'$ is composed of the covariates related only to fixed effects, meaning
-		with no patient-specific contribution.
+		with no unit-specific contribution.
 		\begin{equation}
 			W'=
 			\begin{bmatrix*}
@@ -190,7 +197,7 @@ where we have used the following new quantities:
 			;
 		\end{equation}
 	\item[--] $\bm{b}'$ is the regression coefficient relative to the
-		covariates with patient-specific effect,
+		covariates with unit-specific effect,
 		\begin{equation}
 			\bm{b}'=
 			\begin{bmatrix*}
@@ -201,11 +208,11 @@ where we have used the following new quantities:
 			;
 		\end{equation}
 \end{itemize}
-Let us also use the following notation, which allows us to properly
-refer to sizes of vectors and matrices defined before.\\ We indicate with $q$
-the number of covariates, and with $p$ the number of covariates with
-patient-specific interest. Therefore $q-p$ is the number of covariates
-considered for their fixed effect contribution only.
+To properly refer to sizes of vectors and matrices defined before, we
+use the following notation. We indicate with $q$ the number of covariates, and
+with $p$ the number of covariates with unit-specific interest. Therefore $q-p$
+is the number of covariates considered for their fixed effect contribution
+only.
 
 Vector $\bm{b}'$ belongs to $\R^{mp}$, $\bm{\beta}'$ to $\R^{q-p}$ and we can
 relate it to previously defined vectors $\bm{b}$, $\bm{\beta}$ ($\in
@@ -233,6 +240,12 @@ and $\bm{\beta}^*$ while for $\bm{b}$ holds the following:
 	\end{bmatrix}
 	.
 \end{equation}
+
+For what concerns the sizes of the matrices defined before, we deduce that $W_i
+	\in \R^{n_i \times q}$, $W \in \R^{N \times q}$, $V_i \in \R^{n_i \times p}$,$V
+	\in \R^{N \times p}$, $W'_i \in \R^{n_i \times \left(q-p\right)}$, $W' \in
+	\R^{N \times \left(q-p\right)}$, $V'_i \in \R^{n_i \times p}$,$V' \in \R^{N
+		\times p}$.
 \section{Estimation problem}
 Similarly to what happens with every SR-PDE model, we estimate the unknown
 quantities of the model by solving, with the necessary approximations, the
@@ -282,29 +295,18 @@ $V'_i$ for $i=1,\dots,m$ full rank, we define the following matrices:
 with $X\in \R^{N\times (mp+q-p)}$, H and Q $\in \R^{N\times N}$ are
 the matrices that project a vector, respectively, onto the subspace spanned by
 the columns of X and onto its orthogonal complement with respect to $\R^N$.
-Notice that despite the matrix $X^TX$ exhibits the pattern in
-figure~\ref{fig:pattern1},
 \begin{figure}[t]
-	\begin{subfigure}{0.45\textwidth}
-		\includegraphics[width=\textwidth]{images/3pattern.png}
-		\caption{}
-		\label{fig:pattern1}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}{0.45\textwidth}
-		\includegraphics[width=\textwidth]{images/full_pattern.png}
-		\caption{}
-		\label{fig:pattern2}
-	\end{subfigure}
-	\caption{\textit{(\subref{fig:pattern1}) shows the pattern of
-			generic symmetric matrix $X^TX$ as defined in equation~\ref{matrix:x}. Size has
-			been arbitrarily chosen to be 40. On the right we show the pattern of the
-			inverse of such matrix, illustrating that the inverse is dense. Non-zero values
-			were sampled from a uniform distribution.}} \label{fig:pattern}
+	\includegraphics[width=0.5\textwidth]{images/pattern_xtx.png}
+	\centering
+	\caption{\textit{Sparsity pattern of generic symmetric matrix $X^TX$ as defined in equation~\ref{matrix:x}.
+			Inverse of this matrix is usually dense and is not computed due to the high condition number.}}
+	\label{fig:pattern1}
 \end{figure}
-where only the first row, the first column and the diagonal are
-different from 0, the inverse of this type of matrix is in general dense,
-\textit{c.f.} figure~\ref{fig:pattern2}.
+Notice that matrix $X^TX$ exhibits the pattern in
+figure~\ref{fig:pattern1}, but as it happens with the normal equations, in
+general this type of matrices have large condition number. An ......
+factorization is stored in our implementation for performing several times this
+matrix multiplication.
 
 Define also the vector of coefficients $\bm{\nu} = (\bm{\beta}^\prime,
 	\bm{b}_1^\prime, \dots, \bm{b}_m^\prime) \in \R^{mp+q-p}$.\\ Given these
@@ -326,7 +328,7 @@ Next section deals with the characterization of a possible minimizer
 $\left(\hat{\bm{\nu}} , \hat{f}_1, \dots, \hat{f}_m \right)$ of functional
 \ref{functional_short}.
 \section{Solving the estimation problem}
-Assuming that for each patient $i$, spatial field $f_i$ belongs to
+Assuming that for each unit $i$, spatial field $f_i$ belongs to
 $\mathcal{H}^2(\Omega_i)$, Sobolev space of functions whose first and second
 derivative are in $\mathcal{L}^2(\Omega_i)$, the functional
 \ref{functional_short} is well-defined.\\ We also make the assumption, not
@@ -368,7 +370,7 @@ vector components are $-\Delta \hat{f}_i$, we write system \ref{sys1} as
 	\label{triple}
 	\begin{cases}
 		\bm{\varphi}_N^T Q \hat{\bm{f}}_N + \lambda \sum_{i = 1}^m \int_{\Omega_i}\nabla \varphi_i \nabla g_i d\Omega_i = \bm{\varphi}_N^T Q \bm{z} \\
-		\sum_{i=1}^{m}\left(\int_{\Omega_i}\eta_i \hat{g}_i d\Omega_i +\int_{\Omega_i}\nabla \eta_i \cdot \nabla \hat{f}_i d\Omega_i\right)=0       \\
+		\sum_{i=1}^{m}\left(\int_{\Omega_i}\eta_i \hat{g}_i d\Omega_i -\int_{\Omega_i}\nabla \eta_i \cdot \nabla \hat{f}_i d\Omega_i\right)=0       \\
 		\hat{\bm{\nu}}=\left(X^TX\right)^{-1}X^T(\bm{z}-\hat{\bm{f}}_N)
 	\end{cases}
 	,
@@ -379,6 +381,7 @@ one).\\ This form of the problem is the most suitable for the use of the finite
 element method to compute the desired estimation.
 
 \section{Numerical solution}
+\label{solution}
 In the library \texttt{fdaPDE} we solve the estimation problem by mean of
 finite elements (for detailed description see e.g. \cite{quarteronitosto}). We
 generate a triangular mesh, by partitioning domains $\Omega_i$ with a regular
@@ -397,12 +400,16 @@ Having defined this spaces, we move to the discrete counterpart of problem
 approximated as $\Omega_i^{\tau_i}$. But as we change functional spaces from
 infinite dimension to finite dimension:
 \begin{itemize}
+	%	\item
+	%	      \listvalues
 	\item[--] we can write functions as linear (finite) combinations of finite
 		element basis; we denote as $\bm{\psi}_i$ or $\bm{\psi}^{\left(i\right)}$ if
 		necessary, the vector of fields that constitute a basis for
-		$V^1_{i}\left(\Omega_i^{\tau_i}\right)$; \item[--] we can compute integrals by
+		$V^1_{i}\left(\Omega_i^{\tau_i}\right)$;
+	\item[--] we can compute integrals by
 		numerical techniques, see \cite{quarteronitosto} for technical
-		details;\item[--] thanks to previous two points, problem \ref{triple} is
+		details;
+	\item[--] thanks to previous two points, problem \ref{triple} is
 		equivalently written in algebraic form as a linear system of equations.
 \end{itemize}
 The following matrices definitions are used:\\
@@ -433,7 +440,9 @@ column is $\pdev{\left(\bm{\psi}_i\right)_n}{x_m}$.
 Before we used the operator mapping a generic element $\varphi$, belonging to
 functional space $\mathcal{V}$, to $\bm{\varphi}_N$, the vector obtained by
 concatenation of the evaluations of $\varphi$, at locations $n_i$ for every
-$i$. By defining $\tilde{\Psi}$ as
+$i$. Define $N_{\tau}= \sum_{i=1}^{m} N_{\tau_i}$ the total number of degrees
+of freedom for all the statistical units. By defining $\tilde{\Psi}$, $\in
+	\R^{N \times N_{\tau}}$ as
 \begin{equation}
 	\tilde{\Psi}=
 	\begin{bmatrix}
@@ -448,10 +457,10 @@ the following identity shows the role of $\Psi_i$ matrices:
 	\bm{\varphi}_N=\tilde{\Psi}\bm{\varphi}
 \end{equation}
 where $\bm{\varphi}$ is the coefficient vector of expansion of
-$\varphi$ with respect to finite element basis.
+$\varphi$ with respect to the considered finite element basis.
 
 Analogously as $\tilde{\Psi}$, we define the tensorised versions of $R_0$ and
-$R_1$ matrices as:
+$R_1$ ($\in \R^{N_{\tau} \times N_{\tau}}$) matrices as:
 \begin{equation}
 	\tilde{R_0}=
 	\begin{bmatrix}
@@ -497,13 +506,15 @@ which can be rewritten as
 	\label{nu}
 	\hat{\bm{\nu}}=\left(X^TX\right)^{-1}X^T(\bm{z}-\tilde{\Psi}\hat{\bm{f}})
 \end{equation}
-We call system \ref{mono} monolithic because it might be tough to
-solve it by standard numerical techniques. In fact number of patients $m$ might
-be large, and so the number of nodes $N_{\tau_i}$ for each patient $i$.
+System \ref{mono} has dimensions $\left(2 N_{\tau}\right)^2$. We call
+system \ref{mono} monolithic because it might be tough to solve it by standard
+numerical techniques. In fact $N_{\tau}$ might be large, for both the presence
+of a large number of statistical units $m$ or thanks to a large number of nodes
+$N_{\tau_i}$ for each unit.
 
 Therefore, aim of this work is to avoid the solution of such high dimension
-linear system, in favour of splitting it into many systems ($\simeq m$) of
-lower dimension.
+linear system, in favour of splitting it into many systems ($m$) of lower
+dimension.
 
 In case the dimensions of the monolithic system are treatable, the Woodbury
 decomposition formula, described in appendix \ref{sec:wood}, can be used to
@@ -528,17 +539,6 @@ appendix, with
 	\begin{bmatrix}
 		\left(X^TX\right)^{-1}
 	\end{bmatrix}
-	\quad V = U^Ti.
+	\quad V = U^T.
 \end{equation*}
 
-The general setting above is simplified in the rest of this work by assuming:
-\begin{itemize}
-	\item[--] same domain for all the patients, \ie $\Omega_1 = \ldots = \Omega_m:=
-			\Omega$; \item[--] same locations $\bm{p}_{ij}$ for every patient $i$, that is
-		$\bm{p}_{ij}=\bm{p}_{kj} \quad \forall (i,k) \in \{ 1 \ldots m \}^2$. This also
-		implies that $n_i$, number of observations for patient $i$, is the same for
-		every $i$. In the following we will use $n=n_i$. \item[--] same finite element
-		basis used across all $m$ domains $\Omega$.
-\end{itemize}
-These properties allow storing in memory some of the matrices
-described above just for one patient rather than for all patients.

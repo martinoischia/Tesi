@@ -83,8 +83,14 @@
 \usepackage{cleveref}
 \usepackage[numbered]{bookmark} % Number PDF bookmarks.
 \usepackage{enumitem}
-\setlist[itemize]{leftmargin=*}
-% Useful commands.
+\setlist[itemize]{leftmargin=20pt, topsep = 5pt, partopsep = 0pt, parsep = 5pt, itemsep = \parskip}
+
+\setlist[enumerate]{leftmargin=20pt, topsep = 5pt, partopsep = 0pt, parsep = 5pt, itemsep = \parskip}
+%5.0pt plus 2.5pt minus 1.0pt,
+%\setlist[itemize]{partopsep = 3pt} %3.0pt plus 2.0pt minus 2.0pt,
+%\setlist[itemize]{parsep = 6.5pt} %5.0pt plus 2.5pt minus 1.0pt,
+%\setlist[itemize]{itemsep = 6.5pt} %5.0pt plus 2.5pt minus 1.0pt}
+%Useful commands.
 \newcommand{\dd}{\,\mathrm{d}}
 \newcommand{\eg}{\textit{e.g.}\ }
 \newcommand{\cf}{\textit{c.f.}\ }
@@ -97,7 +103,11 @@
 % Total derivative \tdev{f}{t} = df/dt.
 \newcommand{\tdev}[2]{\frac{\mathrm{d}#1}{\mathrm{d}#2}}
 % Partial derivative \pdev{f}{t}.
-\newcommand{\pdev}[2]{\frac{\partial#1}{\partial#2}} \DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\pdev}[2]{\frac{\partial#1}{\partial#2}}
+% arg min
+\DeclareMathOperator*{\argmin}{arg\,min}
+% trace of a matrix
+\DeclareMathOperator*{\trace}{tr}
 
 % Set here custom margins.
 \usepackage{geometry}

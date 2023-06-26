@@ -1,3 +1,4 @@
+% !TEX root = ../thesis.tex
 \chapter{Formulae}
 \section{Woodbury decomposition}
 \label{sec:wood}
@@ -7,23 +8,32 @@ The following matrix identity holds.
 	\begin{equation}
 		\label{wood}
 		M^{-1}=
-		\left(E + UCV \right)^{-1} = E^{-1} - E^{-1}U\left(C^{-1} + V E^{-1}U\right)^{-1}V E^{-1}
+		\left(E + UCV \right)^{-1} = E^{-1} - E^{-1}U\left(C^{-1} + V E^{-1}U\right)^{-1}V E^{-1}.
 	\end{equation}
 \end{proposition}
 
-In particular, in the case where inverting matrix $E$ can be considered cheap
-or useful, on the righ-hand side solving the system involves solving an
-$n\times n$ system (the one carachterized by matrix $C^{-1} + V E^{-1}U$),
-whilst on the left the dimensions are $m\times m$.\\ This equation is exploited
-for faster system solving in the \verb|fdaPDE| library. As an example, consider
-the space-only problem, described \eg in \cite{sangalli1}: the presence of
-covariates leads to a linear system involving the following matrix $M$:
+Woodbury decomposition is useful in the case where computing a factorization of
+matrix $E$ can be considered cheap or advantageous, \ie solving a system
+involving this matrix is necessary in many places. In fact, looking at the
+right hand side of previous equation, solving a system involving matrix $M$ can
+be done by solving:
+\begin{itemize}
+	\item[--]several $m \times m$ systems involving matrix $E$;
+	\item[--]an $n \times n$ system, where $n$ is supposed to be smaller than $m$, characterized by matrix
+	$ \left( C^{-1} + V E^{-1}U \right)$, as well as several $n \times n$ systems to compute the
+	inverse of $C$, but we will see it is not necessary in our case.
+\end{itemize}
+This equation is exploited for faster system solving in the
+\verb|fdaPDE| library.\newline As an example, consider the space-only problem,
+described \eg in \cite{sangalli1}: the presence of covariates leads to a linear
+system involving the following matrix $M$:
 \begin{equation*}
 	M =
 	\begin{bmatrix}
 		\Psi^TQ\Psi  & -\lambda R_1^T \\
 		-\lambda R_1 & -\lambda R_0
 	\end{bmatrix}
+	.
 \end{equation*} Remembering that the projection matrix Q is defined as $I-H$, $M$
 can be split into the following two components, one independent from $\lambda$:
 \begin{equation*}
@@ -37,16 +47,18 @@ can be split into the following two components, one independent from $\lambda$:
 		-\Psi^TH\Psi & 0 \\
 		0            & 0
 	\end{bmatrix}
+	.
 \end{equation*} By defining $E$ the left matrix of the two above (which is also the
 matrix corresponding to the problem without covariates), and remembering that
-$H = W\left(W^TW\right)^{-1}W^T$, Woodbury decomposition can be exploited
-defining the following matrices $U, C, V$:
+$H = W\left(W^TW\right)^{-1}W^T$, Woodbury decomposition can be exploited, by
+defining the matrices $U, C, V$ in the following way:
 \begin{equation*}
+	UCV=
 	\begin{bmatrix}
 		-\Psi^TW\left(W^TW\right)^{-1}W^T\Psi & 0 \\
 		0                                     & 0
 	\end{bmatrix}
-	= UCV
+	,
 \end{equation*}
 \begin{equation*}
 	U =
@@ -54,19 +66,125 @@ defining the following matrices $U, C, V$:
 		\Psi^TW \\
 		0
 	\end{bmatrix}
+	,
 \end{equation*}
 \begin{equation*}
 	C = -
 	\begin{bmatrix}
 		\left(W^TW\right)^{-1}
 	\end{bmatrix}
+	,
 \end{equation*}
 \begin{equation*}
 	V = U^T =
 	\begin{bmatrix}
 		W^T\Psi & 0
 	\end{bmatrix}
-\end{equation*} where the $0s$ indicate matrices of zeros of suitable dimensions.\\
-Since matrices $U, C, V$ do not depend on $\lambda$, computing the solution of
-the system for different values of $\lambda$ involves only the factorization of
-the matrix $E$ (and the cheaper $C^{-1} + V E^{-1}U$).
+	,
+\end{equation*} where the $0s$ indicate matrices of zeros of suitable dimensions.
+
+In this case solving a system involving matrix $C$ is simply a multiplication
+by $W^T W$.
+
+\section{Handling missing values}
+\label{secNA}
+Consider, as in appendix \ref{sec:wood}, the basic space-only problem,
+characterized by equations
+\begin{equation}
+	\begin{bmatrix}
+		\Psi^TQ\Psi  & -\lambda R_1^T \\
+		-\lambda R_1 & -\lambda R_0
+	\end{bmatrix}
+	\begin{bmatrix}
+		\bm{f} \\
+		\bm{g}
+	\end{bmatrix}
+	=
+	\begin{bmatrix}{\Psi}^T Q\bm{z} \\
+		0
+	\end{bmatrix}
+	.
+\end{equation}
+We could use the notation $\Psi_n$, $Q_n$, $z_n$ since these are the
+quantities that depend on the $n$ observed values.
+
+Now suppose that the $m$-th observation $z_m$ is not available. If we were
+unaware of this information, we would build the system with quantities of index
+$n-1$:
+
+\begin{equation}
+	\label{n-1}
+	\begin{bmatrix}
+		\Psi_{n-1}^TQ_{n-1}\Psi_{n-1} & -\lambda R_1^T \\
+		-\lambda R_1                  & -\lambda R_0
+	\end{bmatrix}
+	\begin{bmatrix}
+		\bm{f} \\
+		\bm{g}
+	\end{bmatrix}
+	=
+	\begin{bmatrix}{\Psi}_{n-1}^T Q_{n-1}\bm{z}_{n-1} \\
+		0
+	\end{bmatrix}
+\end{equation}
+
+From a computational point of view, when implementing the mixed-effects model
+with multiple systems to solve analogous to the previous one, or simililarly in
+spatio-temporal regression, it is certainly preferable to keep the matrices
+with the original size rather than building matrices of different sizes. This
+fact justifies the need to write a system equivalent to \ref{n-1} as a system
+corresponding to an $n$ observations case.\\ We impose equality of
+correspondant terms.\\ By definition of $Q=I-W \left( W^T W \right) W^T$, it is
+logical to set to $0$ the covariates corresponding to the $m$-th unused
+observation: in such a way $W^T_nW_n=W^T_{n-1}W_{n-1}$. This operation leads to
+$Q_n$ being the matrix obtained from $Q_{n-1}$ by adding the $m$-th row and the
+$m$-th column of zeros except for the unitary diagonal element.\\ For the
+left-hand side,
+\begin{equation}
+	\left(\Psi^T_nQ_n\Psi_n\right)_{ij}=\left(\Psi_{n-1}^TQ_{n-1}\Psi_{n-1}\right)_{ij}
+\end{equation}
+leads to
+\begin{equation}
+	\sum_{k,l}\left(\Psi_n\right)_{ki}\left( Q_n \right)_{kl} \left( \Psi_n\right)_{lj}=
+	\sum_{k,l}\left(\Psi_{n-1}\right)_{ki}\left( Q_{n-1} \right)_{kl} \left( \Psi_{n-1}\right)_{lj}.
+\end{equation}
+Removing the identical terms, we are left with:
+\begin{equation}
+	\sum_{k=m,l}\left(\Psi_n\right)_{ki}\left( Q_n \right)_{kl} \left( \Psi_n\right)_{lj}
+	+
+	\sum_{k \neq m,l=m}\left(\Psi_n\right)_{ki}\left( Q_n \right)_{kl} \left( \Psi_n\right)_{lj}
+	=0
+\end{equation}
+Removing the zero terms, we obtain
+\begin{equation}
+	\left(\Psi_n\right)_{mi}\left( \Psi_n\right)_{mj}=0
+\end{equation}
+We obtain then that $\Psi_n$ is the same as $\Psi_{n-1}$ except for
+the $m$-th row, where its original value is replaced by zeros. Recalling the
+meaning of $\Psi$ matrix, this means that any function evaluates to $0$ in the
+position corresponding to the missing value.
+
+Comparing the right-hand side,
+\begin{equation}
+	\left( \Psi_{n-1}^T Q_{n-1}\bm{z}_{n-1}\right)_i =
+	\left( \Psi_{n}^T Q_{n}\bm{z}_{n}\right)_i
+\end{equation}
+we get
+\begin{equation}
+	\sum_{k,l} \left( \Psi_{n}\right)_{ki} \left(  Q_{n} \right)_{kl} \left( \bm{z}_{n} \right)_l
+	=
+	\sum_{k,l} \left( \Psi_{n-1}\right)_{ki} \left(  Q_{n-1} \right)_{kl} \left( \bm{z}_{n-1} \right)_l .
+\end{equation}
+Again, assuming we set $z_m=0$, the differences come on lhs when
+$k=m$ or $l=m$. But the case $l=m$ is 0 because $z_m$ is $0$. The case $k=m$ is
+0 because $\left( Q_n\right)_{ml}$ is 0.
+
+In conclusion, for writing an equivalent system it is sufficient, like one
+could naturally guess, to:
+\begin{itemize}
+	\item[--] replace the missing value with $0$;
+	\item[--] replace the covariates corresponding to the missing value with $0$s;
+	\item[--] replace the row of $\Psi$ matrix corresponding to the missing value with $0$s.
+\end{itemize}
+Notice that it is straightforward to generalize this result in the
+case where the missing values are more than one.

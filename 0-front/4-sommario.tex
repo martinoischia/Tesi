@@ -1,4 +1,19 @@
 % !TEX root = ../thesis.tex
 
 \addchap{Sommario}
-Traduzione dell'abstract in italiano.
+In questo lavoro viene proposto un algoritmo iterativo per sistemi
+lineari di grandi dimensioni e viene implementato nella libreria di
+R \texttt{fdaPDE}.
+Le equazioni originano da un problema di minimizzazione di un
+problema funzionale che viene discretizzato attraverso gli elementi
+finiti. Infatti, nel contesto di un modello a effetti misti, ogni
+unità statistica aumenta la dimensione del sistema di $2 N_{\tau}$, 
+due volte il numero di gradi di libertà degli elementi finiti.\newline
+Per rendere possibile il calcolo di una soluzione, ad ogni iterazione
+vengono risolti $m$ sistemi lineari di dimensioni
+$\left(2 N_{\tau}\right)^2$, con $m$ il numero di unità statistiche,
+al posto di uno di dimensioni $\left(2m N_{\tau}\right)^2$.\newline
+Vengono condotte delle simulazioni al calcolatore e il modello proposto
+viene infine applicato a dati di risonanza magnetica funzionale nella
+corteccia cerebrale.
+

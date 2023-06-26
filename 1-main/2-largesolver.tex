@@ -8,8 +8,9 @@ Following the ideas stemmed from the spatio-temporal regression in
 \citeauthor{pollini} \cite{pollini} and \citeauthor{massardi} \cite{massardi},
 we consider an iterative scheme. At each step $i$ the scheme computes an
 approximate solution $(\hat{\bm{f}}^{i},\hat{\bm{g}}^{i})$ of the monolithic
-system by solving a single-unit problem for each statistical unit. The
-algorithm stops with two possible criteria:
+system by solving a single-unit problem for each statistical unit. As every
+iterative scheme, we have (initialization equivalent to initializing to 0)....
+The algorithm stops with two possible criteria:
 \begin{itemize}
 	\item[--]A maximum number of iterations is reached; \item[--] The following two
 		conditions are true. \\ The first one is that the functional \ref{functional}
@@ -171,11 +172,10 @@ computed at each iteration for the estimation of the functional
 \ref{functional}, according to equation \ref{nu}.
 
 \subsection{The iterative method as a preconditioned Richardson method}
-Given a generic preconditioning matrix $P$, calling $\bm{r}_k$ the residual of
-the linear system $A \bm{x} = \bm{b}$ (that is the vector $A \bm{x}_k -
-	\bm{b}$) at step $k$, Richardson method (\textit{cf.}, for example,
-\cite{Quarteroni})consists in solving (or rather trying to) the linear system
-iterating the following steps:
+Given a generic preconditioning matrix $P$, defining $\bm{r}_k=A \bm{x}_k -
+	\bm{b}$ the residual of the linear system $A \bm{x} = \bm{b}$ at step $k$,
+Richardson method (\textit{cf.}, for example, \cite{Quarteroni}) consists in
+solving (or rather trying to) the linear system iterating the following steps:
 \begin{enumerate}
 	\item Solve $P \bm{z}_k = \bm{r}_k$
 	\item Compute the acceleration parameter $\alpha_k$ (for simplicity we use $\alpha_k = 1$)
@@ -193,14 +193,14 @@ with the following preconditioning matrix:
 		-\lambda \tilde{R}_1 & -\lambda \tilde{R}_0
 	\end{bmatrix}
 \end{equation}
-Solving a large linear system involving this matrix is indeed like
-solving $m$ linear systems of dimensions $2n\times 2n$.
+Solving a large linear system involving matrix $P$ is indeed solving
+$m$ independent linear systems of dimensions $2n\times 2n$.
 \section{Generalized cross validation}
 Problem \ref{mono} is solved multiple times on a grid of $\lambda s$. The best
 $\lambda$ is then chosen according to a generalized cross-validation criterion.
 In particular, as in \cite{sangalli1}, the minimum of the generalized
 cross-validation (GCV) parameter is used as a model selection criterion. The
-generalization of this parameter to the mixed-effect model reads as follows:
+corresponding parameter in the mixed-effect model reads as follows:
 \begin{equation}
 	\label{GCV}
 	GCV(\lambda) = \frac{1}{N\left(1-\left(q-p+mp+tr\left(S\right)\right)/N\right)^2}\norm{\bm{z} - \hat{\bm{z}}}^2
@@ -218,10 +218,51 @@ and it stems as a Schur complement for system \ref{mono} with respect
 to the estimated field $\hat{\bm{f}}$.\\ The computation of the GCV parameter
 \ref{GCV} involves the expensive computation of the trace of the smoothing
 matrix $S$. Since for any two matrices $A$ and $B$ such that the product $AB$
-is defined, it holds that $tr\left(AB\right) = tr\left(BA\right)$, the trace of
-$S$ can be computed as the trace of
+is defined, it holds that $\trace \left(AB\right) = \trace \left(BA\right)$,
+the trace of $S$ can be computed as the trace of
 \begin{equation}
+	\label{s_tilda}
 	\tilde{S} = \left(\tilde{\Psi}^TQ\tilde{\Psi} + \lambda \tilde{R}_1^T
 	\tilde{R}_0^{-1} \tilde{R}_1\right)^{-1}\tilde{\Psi}^TQ \tilde{\Psi}.
 \end{equation}
+Woodbury decomposition, see \ref{sec:wood}, can be exploited here too
+for the matrix inside the parenthesis. By choosing the following matrices
+\begin{equation}
+	E = \tilde{\Psi}^T\tilde{\Psi} +  \lambda \tilde{R}_1^T
+	\tilde{R}_0^{-1} \tilde{R}_1
+	\quad U =
+	\tilde{\Psi}^TX
+\end{equation}
+\begin{equation*}
+	C = - \left( X^TX \right)^{-1}
+	\quad V = X^T \tilde{\Psi},
+\end{equation*} $E$ is a block diagonal matrix that allows easy system solving.
+Other than $E$, with this approach we move the complex system to solve to the
+dimensions of $X^TX$, that are $q-p+mp$. One obtains that
+\begin{equation}
+	\trace \left(\tilde{S} \right) =
+	\trace \left(  \left( E^{-1} - E^{-1}U\left(C^{-1} + V E^{-1}U\right)^{-1}V E^{-1} \right)
+	\tilde{\Psi}^TQ \tilde{\Psi} \right).
+\end{equation}
+Rearranging, substituting, defining $G=E^{-1}\tilde{\Psi}^TQ
+	\tilde{\Psi}$, we get
+\begin{equation}
+	\trace \left(\tilde{S} \right) =
+	\trace \left(G\right)  -
+	\trace \left(  E^{-1}\tilde{\Psi}^TX\left(X^T \tilde{\Psi} E^{-1}\tilde{\Psi}^TX - X^TX\right)^{-1}X^T \tilde{\Psi} G\right).
+\end{equation}
 
+For convenience, in the library was first implemented a simplified method to
+compute the degrees of freedom, while the method just described is left to be
+programmed. The implemented method follows a logic similar to the one of the
+iterative method. In the simulations and the applications described later it
+did not constitute an issue, and where was possible to compute the value in
+different ways we notice the difference was basically negligible.
+
+In this method we approximate $\tilde{S}$ in equation \ref{s_tilda} by
+considering the block diagonal approximation of the group
+$\tilde{\Psi}^TQ\tilde{\Psi}$. As we have seen before, its $k$-th diagonal
+block is $\Psi^TQ_i\Psi$. Trace of $\tilde{S}$ can therefore be written as
+\begin{equation}
+	\trace \left(\tilde{S} \right) = \sum_{i=1}^{m} \left( \Psi^TQ_i\Psi  +  \lambda \tilde{R}_1^T \tilde{R}_0^{-1} \tilde{R}_1\right)^{-1}   \Psi^TQ_i\Psi .
+\end{equation}

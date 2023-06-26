@@ -1,4 +1,16 @@
 % !TEX root = ../thesis.tex
 
 \addchap{Abstract}
-aa
+It is proposed an iterative solver for large linear systems, and it 
+is implemented in R library \texttt{fdaPDE}.
+The equations originate from a functional minimization problem
+that is discretized with finite elements. In fact,
+in such context of mixed-effects models,
+each statistical unit increases the size of the system by $2 N_{\tau}$, twice the number of
+the finite elements degrees of freedom.\newline
+To make computing a solution possible, at each iteration are solved 
+$m$ linear systems of dimensions $\left(2 N_{\tau}\right)^2$,
+$m$ being the number of statistical unit, instead of one of
+dimensions $\left(2m N_{\tau}\right)^2$.\newline
+A simulation study is carried out and the proposed
+method is finally applied to fMRI data in the cerebral cortex.
