@@ -13,10 +13,10 @@ The following matrix identity holds.
 \end{proposition}
 
 Woodbury decomposition is useful in the case where computing a factorization of
-matrix $E$ can be considered cheap or advantageous, \ie solving a system
-involving this matrix is necessary in many places. In fact, looking at the
-right hand side of previous equation, solving a system involving matrix $M$ can
-be done by solving:
+matrix $E$ can be considered cheap or advantageous, for example when solving a
+system involving this matrix is necessary in many places. In fact, looking at
+the right hand side of previous equation, solving a system involving matrix $M$
+can be done by solving:
 \begin{itemize}
 	\item[--]several $m \times m$ systems involving matrix $E$;
 	\item[--]an $n \times n$ system, where $n$ is supposed to be smaller than $m$, characterized by matrix
@@ -85,6 +85,16 @@ defining the matrices $U, C, V$ in the following way:
 
 In this case solving a system involving matrix $C$ is simply a multiplication
 by $W^T W$.
+
+Moreover, matrix
+\begin{equation}
+	E=
+	\begin{bmatrix}
+		\Psi^T\Psi   & -\lambda R_1^T \\
+		-\lambda R_1 & -\lambda R_0
+	\end{bmatrix}
+\end{equation}
+is fully sparse and this is very convenient when the size is large.
 
 \section{Handling missing values}
 \label{secNA}

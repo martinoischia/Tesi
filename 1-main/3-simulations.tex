@@ -1,5 +1,6 @@
 % !TEX root = ../thesis.tex
 \chapter{Simulation studies}
+\label{simul}
 \section{Assumptions}
 The general setting described in section \ref{solution} is simplified in the
 rest of this work by assuming:
@@ -46,7 +47,8 @@ called \texttt{fdaPDE\_mixed}, while my code is available on GitHub, see
 It is worth mentioning that when I began to work on this project, several new
 versions of \texttt{fdaPDE} had come out, so I took the opportunity to update
 the APIs that were provided by \citeauthor{kim} and refactor her code in such a
-way that it will be easear to maintain a mixed-effects branch in the future.
+way that it will be easear to maintain a \textit{mixed-effects} branch in the
+future.
 
 \section{Simulations}
 \subsection{Bidimensional domain}
@@ -76,54 +78,66 @@ all statistical units.
 
 The model estimates coefficients given a fixed grid of $\lambda$ values, and
 the $\lambda$ value with the minimum generalized cross-validation (GCV) is
-chosen as the best $\lambda$ from the grid.
+chosen as the best $\lambda$ from the grid. The logic for choosing the
+appropiate values of the grid is the following: if the same $\lambda$ is
+observed most of the times on different simulations, it means that the grid is
+not fine enough near the optimal $\lambda$. Moreover the grid of $\lambda$
+should be big enough so that the boundary of the grid is not chosen. Cleary, on
+the other hand, if the grid is too fine, the method would be very slow. In
+practice the grid is chosen through trial and error.
 
-The logic for choosing the appropiate values of the grid is the following: if
-the same $\lambda$ is observed most of the times on different simulations, it
-means that the grid is not fine enough near the optimal $\lambda$. Moreover the
-grid of $\lambda$ should be big enough so that the boundary of the grid is not
-chosen. Cleary, on the other hand, if the grid is too fine, the method would be
-very slow. In practice the grid is chosen through trial and error.
+Tolerance for the iterative method was chosen to be $10^{-6}$, the number of
+random vectors to estimate the trace of the smoothing matrix.
 
-Tolerance for the iterative method was chosen to be $10^{-6}$.\\ In figure
-\ref{lambda} we show the comparison of the $\lambda$ selected values, the
-difference is due to the different method for computing the degrees of freedom,
-since the solutions are the same if not for the tolerance. Despite looking
-slightly different in truth the selected values of $\lambda$ are the same if
-not for a few of them where the index is shifted on the grid by one.
+Solutions for a fixed $\lambda$ are here always the same, if not for the
+tolerance. In figure \ref{lambda} we show the comparison of the values of
+$\lambda$ selected, where the degrees of freedom have been estimated on the
+full smoothing matrix for the monolithic case and on the diagonal approximation
+for the iterative method.
 
 Figure \ref{iterations} shows how many iterations were needed for convergence
 on the grid of $\lambda$. In all cases it converged very rapidly, in less than
 4 iterations.
-
 \begin{figure}[t]
-	\centering
-	\begin{subfigure}{0.45\textwidth}
-		\includegraphics[width=\textwidth]{images/lambda.png}
+	\flushleft
+	\begin{subfigure}{0.49\textwidth}
+		\includegraphics[width=0.9\textwidth]{images/lambda.png}
 		\centering
 		\caption{\textit{Frequency of selected $\lambda$ over 50 simulations. }}
 		\label{lambda}
 	\end{subfigure}
 	\hfill
-	\begin{subfigure}{0.45\textwidth}
-		\includegraphics[width=\textwidth]{iterations.png}
+	\begin{subfigure}{0.49\textwidth}
+		\includegraphics[width=0.9\textwidth]{iterations.png}
 		\centering
-		\caption{\textit{ Iterations observed on different values of $\lambda$ }}
+		\caption{\textit{ Iterations to reach convergence across different selected $\lambda$s. }}
 		\label{iterations}
 	\end{subfigure}
+	\caption{\textit{Simulation on C-shape domain. Both figures refer to
+			the optimal $\lambda$ on a grid according to a generalized cross-validation
+			criteria.}}
+\end{figure}
+\begin{figure}
+	\centering
 	\begin{subfigure}{0.45\textwidth}
 		\includegraphics[width=\textwidth]{images/beta.png}
 		\centering
-		\caption{\textit{Boxplots for fixed effects parameters. }}
+		\caption{\textit{Boxplots of fixed effects parameters. $\beta_1$ is related to the covariate considered also as a random effect for each unit, while $\beta_2$ corresponds to the covariate considered for its contribution
+				as a fixed effect.}}
 		\label{beta}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}{0.45\textwidth}
 		\includegraphics[width=\textwidth]{images/b.png}
 		\centering
-		\caption{\textit{Boxplots for random effects parameters.}}
+		\caption{\textit{Boxplots of random effects parameters, for every statistical unit.}}
 		\label{b}
 	\end{subfigure}
+	\caption{\textit{Estimated parametric coefficients for the
+			mixed-effects on the C-shape domain.} I \textit{label is relative to the
+			iterative method while} M \textit{is relative to the monolithic solver. The
+			gray horizontal line represents the true vale for the parameter. No meaningful
+			differences are observed between the two solvers. }}
 \end{figure}
 
 In figure \ref{beta} we show the boxplot for the estimated $\beta_1$,
@@ -145,23 +159,55 @@ simulation study was conducted under specific assumptions and conditions, and
 the performance of the method may vary in different settings.
 
 \subsection{Manifold domain}
-aaa
+Simulations have been carried out on the surface of a sphere, see the mesh in
+\ref{sphere}. Again, the iterative method converged to the desired solution in
+less than 6 iterations.
+\begin{figure}
+	\includegraphics[width=0.6\textwidth]{images/sphere.png}
+	\centering
+	\caption{\textit{Mesh for the example of SR-PDE model on a manifold.}}
+	\label{sphere}
+\end{figure}
 \subsection{NAs handling}
-discorso media It is important to note that missing data can have a significant
-impact on the performance of statistical models. In the study described, the
-RMSE increased with the presence of missing data in the response variable.
-However, it is encouraging to see that the model was able to recover a
-considerable amount of information even in the presence of missing data.
+%discorso media 
+The ability of the model to deal with missing values has been tested on the
+C-shape domain. Convergence was within the 6 iterations number again. See
+\ref{betana} \ref{bna} \ref{rmsena} for the results.
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{images/betana.png}
+		\centering
+		\caption{\textit{Boxplots of fixed effects parameters. $\beta_1$ is related to the covariate considered also as a random effect for each unit, while $\beta_2$ corresponds to the covariate considered for its contribution
+				as a fixed effect.}}
+		\label{betana}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\textwidth]{images/bna.png}
+		\centering
+		\caption{\textit{Boxplots of random effects parameters, for every statistical unit.}}
+		\label{bna}
+	\end{subfigure}
+	\caption{\textit{Estimated parametric coefficients for the
+			mixed-effects on the C-shape domain in case of missing values.} }
+\end{figure}
 
-Furthermore, the study also highlighted the impact of randomness in covariates
-on the performance of the model. When there was a high level of randomness in
-the covariates, the model was less accurate. However, as the level of
-randomness decreased, the model's accuracy improved.
-
-Overall, the results suggest that mixed-effect models can be a useful tool for
-handling missing data in real-world applications. However, it is important to
-carefully consider the level of randomness in the covariates and to choose an
-appropriate model based on the specific characteristics of the data.
+\begin{figure}[t]
+	\includegraphics[width=0.6\textwidth]{images/rmsena.png}
+	\centering
+	\caption{\textit{Root mean square error for the estimated model in case of missing values.}}
+	\label{rmsena}
+\end{figure}
+%Furthermore, the study also highlighted the impact of randomness in covariates
+%on the performance of the model. When there was a high level of randomness in
+%the covariates, the model was less accurate. However, as the level of
+%randomness decreased, the model's accuracy improved.
+%
+%Overall, the results suggest that mixed-effect models can be a useful tool for
+%handling missing data in real-world applications. However, it is important to
+%carefully consider the level of randomness in the covariates and to choose an
+%appropriate model based on the specific characteristics of the data.
 
 % \begin{figure}[t] \begin{subfigure}{0.45\textwidth}
 % \includegraphics[width=\textwidth]{images/1boxplot_beta1.png} \caption{}

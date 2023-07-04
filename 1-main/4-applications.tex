@@ -5,62 +5,55 @@ Functional Magnetic Resonance Imaging (fMRI) is an imaging technique developed
 to detect regional, time-varying changes in brain metabolism, which can arise
 from task-induced cognitive state changes or unregulated processes in the
 resting brain. Since the 90s, fMRI has become widely used in the context of
-cognitive neurosciences, psychiatry and psychology and a large number of studies are available on it. The
-popularity of fMRI can be attributed to its widespread availability,
-non-invasive nature, relatively low cost, and good spatial resolution.
+cognitive neurosciences, psychiatry and psychology and a large number of
+studies are available on it. The popularity of fMRI can be attributed to its
+widespread availability, non-invasive nature, relatively low cost, and good
+spatial resolution.
 
-In this study, we want to prosecute the work started in \citeauthor
-\cite{kim}. In the appendix of her thesis the interested reader
-can find the description on how to access all the databases we used, and also the patients that she utilized in her study.
-For the sake of the mixed-effects model, the statistical units are several patients on which
-fMRI observations were taken as a time-series.
+In this study, we want to prosecute the work started in \cite{kim}. In the
+appendix of her thesis the interested reader can find the description on how to
+access all the databases we used, and also the patients that she utilized in
+her study.  For the sake of the mixed-effects model, the statistical units are
+several patients on which fMRI observations were taken as a time-series.
 
-As described in \citeauthor{kim}, we first process the large amount of time-series data (1200
-rows per brain location), and we move to analyze the so-called Functional
-Connectivity (FC) maps. FC maps are constructed by computing pairwise
-correlations between the fMRI time-series of all brain locations and the mean
-time-series of a Region of Interest (ROI) on the cortical surface.
-Further, a Fisher transformation is applied on the obtained variable. In this way,
-we can shed some light in identifyng the areas of the
+As described by \citeauthor{kim}, we first process the large amount of
+time-series data (1200 rows per brain location), and we move to analyze the
+so-called Functional Connectivity (FC) maps. FC maps are constructed by
+computing pairwise correlations between the fMRI time-series of all brain
+locations and the mean time-series of a Region of Interest (ROI) on the
+cortical surface.  Further, a Fisher transformation is applied on the obtained
+variable. In this way, we can shed some light in identifyng the areas of the
 brain that are functionally connected to the ROI. 
 
-As done before in similar studies, we consider precuneus as the Region Of Interest.
-We use the available data of the cortical thickness of
-the cerebral cortex as a covariate for our mixed-effects model.
-The cortex is in fact known to stimulate neural activity.
+As done before in similar studies, we consider precuneus as the Region Of
+Interest.  We use the available data of the cortical thickness of the cerebral
+cortex as a covariate for our mixed-effects model.  The cortex is in fact known
+to stimulate neural activity.
 
-For this type of application it is possible to consider the thin cerebral cortex as a 2D surface embedded in a 3D space.
-Despite the unique geometrical properties of each individual brain, we use a common
-standard surface provided by the Conte69 brain atlas, as well as a common mesh.
-Moreover, as it was done in \cite{kim} we limit ourselves to the left hemisphere.
-The Conte69 brain atlas contains a large number of locations (32492) in the
-brain. This locations correspond with the locations on which we observe the fMRI
-data.
+For this type of application it is possible to consider the thin cerebral
+cortex as a 2D surface embedded in a 3D space.  Despite the unique geometrical
+properties of each individual brain, we use a common standard surface provided
+by the Conte69 brain atlas, as well as a common mesh.  Moreover, as it was done
+in \cite{kim} we limit ourselves to the left hemisphere.  The Conte69 brain
+atlas contains a large number of locations (32492) in the brain. This locations
+correspond with the locations on which we observe the fMRI data.
 
-\citeauthor{kim}, not having at her disposal a version of the library that exploits
-the convenience of the use of sparse matrices, as well as the iterative method that
-greatly reduces the amount of RAM needed, had to perform some simplifications.
-She used two different meshes, the original one with 32492 nodes
-and a simplified one with 10000 nodes. The latter allowed her to study at same time
-more patients while keeping the system manageable.
-She considered $12$ patients for the full mesh study and $30$ for
-the simplified mesh study, but several hundreds are available.
-In my case, I moved to $60$ patients, as each patient data occupy around
-one GB of storage.
+\citeauthor{kim}, not having at her disposal a version of the library that
+exploits the convenience of the use of sparse matrices, as well as the
+iterative method that greatly reduces the amount of RAM needed, had to perform
+some simplifications.  She used two different meshes, the original one with
+32492 nodes and a simplified one with 10000 nodes. The latter allowed her to
+study at same time more patients while keeping the system manageable.  She
+considered $12$ patients for the full mesh study and $30$ for the simplified
+mesh study, but several hundreds are available.  In my case, I moved to $60$
+patients, as my small hard disk was not allowing more.
 
-The mesh strategy that she adopted was well studied and took into account various criteria, such as
-preserving the topology and shape of the original mesh, but the results were not
-validated.
+The mesh strategy that she adopted was well studied and took into account
+various criteria, such as preserving the topology and shape of the original
+mesh, but the results were not validated.
 
-It is worth noting that these maps use the same scale for all 12
-patients. The region of interest, precuneus, is situated in the upper left area
-of the brain, as illustrated in Figure 5.4. Given that the connectivity of this
-region with itself should be high, this area is colored in red in each
-estimated function. Although patients share the same red pattern in the
-precuneus, they exhibit different colors in distinct regions on Figure 5.6.
-While some patients exhibit significant contrast in certain areas of the brain,
-others lack distinctive characteristics. A few patients possess a similar
-pattern to that seen in Fig. The function estimates shown in Fig
-and exhibit noticeable variations in color between different patients,
-indicating that there may be significant differences in brain connectivity
-patterns across individuals.
+The iterative method successfully run on a grid of $10$ $\lambda$s, using again
+60 as the number of stochastic realizations to estimate the degrees of freedom.
+Again the method converged in less than 6 iterations, taking less than two
+hours to run, and the parameters estimated are in line with those of
+\cite{kim}.

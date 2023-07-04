@@ -6,28 +6,33 @@
 
 Following the ideas stemmed from the spatio-temporal regression in
 \citeauthor{pollini} \cite{pollini} and \citeauthor{massardi} \cite{massardi},
-we consider an iterative scheme. At each step $i$ the scheme computes an
-approximate solution $(\hat{\bm{f}}^{i},\hat{\bm{g}}^{i})$ of the monolithic
-system by solving a single-unit problem for each statistical unit. As every
-iterative scheme, we have (initialization equivalent to initializing to 0)....
-The algorithm stops with two possible criteria:
+we consider an iterative scheme. At each step $k$ the scheme computes an
+approximate solution $(\hat{\bm{f}}^{k},\hat{\bm{g}}^{k})$ of the monolithic
+system by solving a single-unit problem for each statistical unit. After
+initializing the needed quantities, we execute iterations until we satisfy a
+stopping criterion.\\ Denote with $J^k = J_{\Omega_i, \lambda}\left(
+	\hat{\bm{\beta}}^{\prime k}, \hat{\bm{b}}^{\prime k}_1, \dots,
+	\hat{\bm{b}}^{\prime k}_m, \hat{f}_1^k, \dots, \hat{f}_m^k \right)$ the
+functional $J_{\Omega_i, \lambda}$ in \ref{functional}, evaluated in the
+estimated solution at the $k$-th iteration.\\ The algorithm stops with two
+possible criteria:
 \begin{itemize}
-	\item[--]A maximum number of iterations is reached; \item[--] The following two
-		conditions are true. \\ The first one is that the functional \ref{functional}
-		evaluated in the estimated solution $J^i = J_{\Omega_i, \lambda}\left(
-			\hat{\bm{\beta}}^{\prime i}, \hat{\bm{b}}^{\prime i}_1, \dots,
-			\hat{\bm{b}}^{\prime i}_m, \hat{f}_1^i, \dots, \hat{f}_m^i \right)$ has reached
-		stagnation, that is the relative increment $\left( J^i - J^{i-1}\right) / J^i$
-		is below a certain threshold. In the code such threshold is an input parameter,
-		it was set to $10^{-8}$. The term $ \int_{\Omega_i} \Delta f_i
-			\left(\bm{p}\right)^2 d\Omega_i $ of the functional \ref{functional} is easily
-		computed by exploiting the expansion into the finite element basis functions:
-		it is equal to $\hat{\bm{g}}_i^T R_0 \hat{\bm{g}}_i$, where $\hat{\bm{g}}_i $
-		is the sub-vector of $\hat{\bm{g}}$ corresponding to unit $i$.\\ The second one
-		is that the estimated solution is close to the exact solution of the system
-		\ref{mono}. This condition is verified by checking that the residual,
-		normalized by the Euclidean norm of the right-hand side, is below a certain
-		threshold (this is another input parameter, $10^{-8}$ was used).
+	\item[--]A maximum number of iterations is reached;
+	\item[--] The following two
+		conditions hold:
+		\begin{enumerate}
+			\item[a)] $J_k$ has reached stagnation, that is the relative increment $\left( J^k - J^{k-1}\right) / J^k$
+				is below a certain threshold. In the code such threshold is an input parameter,
+				it was set to $10^{-6}$. The term $ \int_{\Omega_i} \Delta f_i
+					\left(\bm{p}\right)^2 d\Omega_i $ of the functional \ref{functional} is easily
+				computed by exploiting the expansion into the finite element basis functions:
+				it is equal to $\hat{\bm{g}}_i^T R_0 \hat{\bm{g}}_i$, where $\hat{\bm{g}}_i $
+				is the sub-vector of $\hat{\bm{g}}$ corresponding to unit $i$.
+			\item[b)] The estimated solution is close to the exact solution of system
+				\ref{mono}. This condition is verified by checking that the residual,
+				normalized by the Euclidean norm of the right-hand side, is below a certain
+				threshold (this is another input parameter, $10^{-6}$ was used).
+		\end{enumerate}
 \end{itemize}
 The details of the method that was implemented are described in the
 following sections.
@@ -55,14 +60,14 @@ following approximation is considered:
 \end{equation}
 where $Q_i$ indicates the $i$-th diagonal block of $Q$, of dimensions
 $n \times n$. By definition of $Q$, this is equal to
-$I_n-X_i\left(X^TX\right)^{-1}X_i^T$, with $X_i=X\left(\left(i-1\right)n+1 :
-	in\,, \;:\; \right)$, where the typical notation of MATLAB language has been
-used to express a suitable submatrix.\\ This choice is not casual but it
-naturally stems from the idea behind the iterative method as we will see in
-section \ref{iterburocratico}. Not only: $\Psi^TQ_i\Psi$ is also the $i$-th
-diagonal block of matrix $\tilde{\Psi}^TQ\tilde{\Psi}$. We will show it, for
-example, by means of Woodbury decomposition (appendix \ref{sec:wood}) as used
-in \ref{eq:wootilde}.
+$I_n-X_i\left(X^TX\right)^{-1}X_i^T$, with $X_i$ being the submatrix of $X$
+with coefficients $X_{jk} \ \forall j \in \{(i-1)n+1,\dots,in\},\ \forall k \in
+	\{1,\dots,q-p+mp\}$.\\ This choice is not casual but it naturally stems from
+the idea behind the iterative method as we will see in section
+\ref{iterburocratico}. Not only: $\Psi^TQ_i\Psi$ is also the $i$-th diagonal
+block of matrix $\tilde{\Psi}^TQ\tilde{\Psi}$. We will show it, for example, by
+means of Woodbury decomposition (appendix \ref{sec:wood}) as used in
+\ref{eq:wootilde}.
 
 Express $\tilde{\Psi}^TQ\tilde{\Psi}$ as
 $\tilde{\Psi}^T\tilde{\Psi}-\tilde{\Psi}^TH\tilde{\Psi}$. Thus, defining $U =
@@ -70,7 +75,9 @@ $\tilde{\Psi}^T\tilde{\Psi}-\tilde{\Psi}^TH\tilde{\Psi}$. Thus, defining $U =
 block is equal to $\Psi^T\Psi + U_iCV_i $, where
 \begin{equation}
 	\begin{split}
-		U_i = U\left(\left(i-1\right)N_\mathcal{T}+1 : iN_\mathcal{T}\,, \;:\;\right) = \tilde{\Psi}^T_iX =\\
+		U_i = U_{jk} \ \forall j \in  \{\left(i-1\right)N_\mathcal{T}+1, \dots,
+		iN_\mathcal{T}\},\ \forall k \in \{1 \dots q-p + mp\}\\
+		= \tilde{\Psi}^T_iX =
 		\begin{bmatrix}
 			0 & \dots & 0 & \Psi^T & 0 & \dots & 0
 		\end{bmatrix}
@@ -219,50 +226,77 @@ to the estimated field $\hat{\bm{f}}$.\\ The computation of the GCV parameter
 \ref{GCV} involves the expensive computation of the trace of the smoothing
 matrix $S$. Since for any two matrices $A$ and $B$ such that the product $AB$
 is defined, it holds that $\trace \left(AB\right) = \trace \left(BA\right)$,
-the trace of $S$ can be computed as the trace of
+the trace of $S$ can be expressed as the trace of
 \begin{equation}
 	\label{s_tilda}
 	\tilde{S} = \left(\tilde{\Psi}^TQ\tilde{\Psi} + \lambda \tilde{R}_1^T
 	\tilde{R}_0^{-1} \tilde{R}_1\right)^{-1}\tilde{\Psi}^TQ \tilde{\Psi}.
 \end{equation}
-Woodbury decomposition, see \ref{sec:wood}, can be exploited here too
-for the matrix inside the parenthesis. By choosing the following matrices
-\begin{equation}
-	E = \tilde{\Psi}^T\tilde{\Psi} +  \lambda \tilde{R}_1^T
-	\tilde{R}_0^{-1} \tilde{R}_1
-	\quad U =
-	\tilde{\Psi}^TX
-\end{equation}
-\begin{equation*}
-	C = - \left( X^TX \right)^{-1}
-	\quad V = X^T \tilde{\Psi},
-\end{equation*} $E$ is a block diagonal matrix that allows easy system solving.
-Other than $E$, with this approach we move the complex system to solve to the
-dimensions of $X^TX$, that are $q-p+mp$. One obtains that
-\begin{equation}
-	\trace \left(\tilde{S} \right) =
-	\trace \left(  \left( E^{-1} - E^{-1}U\left(C^{-1} + V E^{-1}U\right)^{-1}V E^{-1} \right)
-	\tilde{\Psi}^TQ \tilde{\Psi} \right).
-\end{equation}
-Rearranging, substituting, defining $G=E^{-1}\tilde{\Psi}^TQ
-	\tilde{\Psi}$, we get
-\begin{equation}
-	\trace \left(\tilde{S} \right) =
-	\trace \left(G\right)  -
-	\trace \left(  E^{-1}\tilde{\Psi}^TX\left(X^T \tilde{\Psi} E^{-1}\tilde{\Psi}^TX - X^TX\right)^{-1}X^T \tilde{\Psi} G\right).
-\end{equation}
+Several approaches are possible here for this computation.
+\begin{enumerate}
+	\item In an exact way, through Woodbury decomposition. Woodbury
+	      decomposition, see \ref{sec:wood}, can be exploited here too
+	      for the matrix inside the parenthesis. By choosing the following matrices
+	      \begin{equation}
+		      E = \tilde{\Psi}^T\tilde{\Psi} +  \lambda \tilde{R}_1^T
+		      \tilde{R}_0^{-1} \tilde{R}_1
+		      \quad U =
+		      \tilde{\Psi}^TX
+	      \end{equation}
+	      \begin{equation*}
+		      C = - \left( X^TX \right)^{-1}
+		      \quad V = X^T \tilde{\Psi},
+	      \end{equation*} $E$ is a block diagonal matrix that allows relatively easy system
+	      solving. Other than $E$, with this approach we move the complex system to solve
+	      to the dimensions of $X^TX$, that are $q-p+mp$. One obtains that
+	      \begin{equation}
+		      \trace \left(\tilde{S} \right) =
+		      \trace \left(  \left( E^{-1} - E^{-1}U\left(C^{-1} + V E^{-1}U\right)^{-1}V E^{-1} \right)
+		      \tilde{\Psi}^TQ \tilde{\Psi} \right).
+	      \end{equation}
+	      Rearranging, substituting, defining $G=E^{-1}\tilde{\Psi}^TQ
+		      \tilde{\Psi}$, we get
+	      \begin{equation}
+		      \trace \left(\tilde{S} \right) =
+		      \trace \left(G\right)  -
+		      \trace \left(  E^{-1}\tilde{\Psi}^TX\left(X^T \tilde{\Psi} E^{-1}\tilde{\Psi}^TX - X^TX\right)^{-1}X^T \tilde{\Psi} G\right).
+	      \end{equation}
+	\item As an approximation, for convenience. In the library was first implemented a simplified method to
+	      compute the degrees of freedom. It follows a logic similar to the one of the
+	      iterative method. In the cases of chapter \ref{simul}, the difference with the exact method
+	      was basically negligible, but no further analysis has been made.
 
-For convenience, in the library was first implemented a simplified method to
-compute the degrees of freedom, while the method just described is left to be
-programmed. The implemented method follows a logic similar to the one of the
-iterative method. In the simulations and the applications described later it
-did not constitute an issue, and where was possible to compute the value in
-different ways we notice the difference was basically negligible.
+	      In this method we approximate $\tilde{S}$ in equation \ref{s_tilda} by
+	      considering the block diagonal approximation of the group
+	      $\tilde{\Psi}^TQ\tilde{\Psi}$. As we have seen before, its $k$-th diagonal
+	      block is $\Psi^TQ_i\Psi$. Trace of $\tilde{S}$ can therefore be written as
+	      \begin{equation}
+		      \trace \left(\tilde{S} \right) = \sum_{i=1}^{m} \left( \Psi^TQ_i\Psi  +  \lambda \tilde{R}_1^T \tilde{R}_0^{-1} \tilde{R}_1\right)^{-1}   \Psi^TQ_i\Psi .
+	      \end{equation}
 
-In this method we approximate $\tilde{S}$ in equation \ref{s_tilda} by
-considering the block diagonal approximation of the group
-$\tilde{\Psi}^TQ\tilde{\Psi}$. As we have seen before, its $k$-th diagonal
-block is $\Psi^TQ_i\Psi$. Trace of $\tilde{S}$ can therefore be written as
-\begin{equation}
-	\trace \left(\tilde{S} \right) = \sum_{i=1}^{m} \left( \Psi^TQ_i\Psi  +  \lambda \tilde{R}_1^T \tilde{R}_0^{-1} \tilde{R}_1\right)^{-1}   \Psi^TQ_i\Psi .
-\end{equation}
+	\item[3-4.] As an estimation (possible both for method 1-2) deriving from the following result.
+		\begin{theorem}[Hutchinson]
+			Let $S$ be a symmetric matrix and let $\bm{u} =
+				\begin{bmatrix}
+					u_1 & \dots & u_N
+				\end{bmatrix}
+			$ be a vector of $N$ independent samples from a random variable $U$
+			which takes values $-1$ and $1$ each with probability $1/2$. Then
+			$\mathbb{E}[\bm{u}^TS\bm{u}] = \trace (S)$.
+		\end{theorem}
+		Matrix $\tilde{S}$ is symmetric, we can therefore exploit the theorem.
+		Results are available in the literature on the asympotic properties of this
+		estimator, which most importantly they do not depend on the size of the matrix.
+		In practice, one makes a compromise between the speed of execution and the
+		accuracy of the computation of the degrees of freedom. For our purposes, 60
+		realizations of the random vector $\bm{u}$ were sufficient (tested on the
+		C-shape domain, the grid of $\lambda$ was leading to larger variations).
+
+		This method allows to reduce drastically the memory necessary to compute the
+		trace of this matrix. Consider for example just the last matrix multiplication,
+		$Q_i \Psi$. The result is a dense matrix because $Q_i$ is dense and will have
+		dimensions $n \times n_{\tau}$, which could be already a large number, if the
+		mesh is fine on a manifold or a 3D domain. With previous theorem instead $\Psi
+			\bm{u}$ has length $n$, which multiplied by $Q_i$ is again a vector of length
+		$n$.
+\end{enumerate}

@@ -1,21 +1,27 @@
 % !TEX root = ../thesis.tex
 
-\chapter{Conclusions and future developments} \label{ch:Conclusions}
+\chapter{Conclusions and future developments} \label{ch:Conclusions} In
+previous sections we have shown that the iterative method is a valid
+alternative to the more direct computation for the solution. It has been
+implemented in the \texttt{fdaPDE} library for the bidimensional case and the
+manifold case. Some further extension and generalization has to be carried out,
+as well as some optimization in the regarding the layout of the matrices and
+their multiplication.
 
 While the focus has been on models sharing the same domain and location points,
-future work should include multiple domains with different location points
-
-The proposed model is not working yet on the fMRI data application but I will
-post soon the corrected results, eventually on my GitHub channel \ref{MI}.
+future work should include multiple domains with different location points.
+The 3D case has still to be implemented, and the only strategy used here for
+estimating the value of $lambda$ was computing the model on a grid of values.
+The methodology could also be possibly extended to spatio-temporal data.
 
 %The current models have a single smoothing parameter, gamma, for each
-%statistical unit, but it is possible to develop models with different smoothing
-%parameters for each unit, allowing for consideration of individual functional
-%wiggliness. Additionally, if problem-specific information about the spatial
-%field is known, such as from physics, mechanics, or chemistry, the models can
-%be extended to include different penalty terms with general PDEs Lf = u, as
-%demonstrated in [2] and [3]. These extensions can also incorporate anisotropy
-%or non-stationarity, as in [4].
+%statistical unit, but it is possible to develop models with different
+%smoothing parameters for each unit, allowing for consideration of individual
+%functional wiggliness. Additionally, if problem-specific information about the
+%spatial field is known, such as from physics, mechanics, or chemistry, the
+%models can be extended to include different penalty terms with general PDEs Lf
+%= u, as demonstrated in [2] and [3]. These extensions can also incorporate
+%anisotropy or non-stationarity, as in [4].
 %
 %The methodology can also be extended to spatio-temporal data, as demonstrated
 %in [1] and [5]. However, this extension would significantly increase
