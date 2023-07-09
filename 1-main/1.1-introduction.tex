@@ -296,10 +296,12 @@ with $X\in \R^{N\times (mp+q-p)}$, H and Q $\in \R^{N\times N}$ are
 the matrices that project a vector, respectively, onto the subspace spanned by
 the columns of X and onto its orthogonal complement with respect to $\R^N$.
 \begin{figure}[t]
-	\includegraphics[width=0.5\textwidth]{images/pattern_xtx.png}
+	\includegraphics[width=\textwidth]{images/pattern_x.png}
 	\centering
-	\caption{\textit{Sparsity pattern of generic symmetric matrix $X^TX$ as defined in equation~\ref{matrix:x}.
-			Inverse of this matrix is usually dense and is not computed due to the high condition number.}}
+	\caption{\textit{On the left, sparsity pattern of an arbitrary matrix X as defined in \ref{matrix:x}.
+			On the right, correspondent pattern of symmetric matrix $X^TX$.
+			Inverse of this matrix is in general dense but does not get computed
+			due to the high condition number of $X^TX$.}}
 	\label{fig:pattern1}
 \end{figure}
 Notice that matrix $X^TX$ exhibits the pattern in
@@ -324,10 +326,10 @@ expressed as
 	J_{\Omega_i, \lambda} \left(\bm{\nu} , f_1, \dots, f_m \right) =
 	\norm{\bm{z}-X\bm{\nu}  -\bm{f}_N}^2 + \lambda \sum_{i = 1}^m \int_{\Omega_i}\Delta f_i \left(\bm{p}\right)^2 d\Omega_i ,
 \end{equation}
-Next section deals with the characterization of a possible minimizer
+Next section describes the properties of a possible minimizer
 $\left(\hat{\bm{\nu}} , \hat{f}_1, \dots, \hat{f}_m \right)$ of functional
 \ref{functional_short}.
-\section{Solving the estimation problem}
+\section{Characterization of the solution}
 Assuming that for each unit $i$, spatial field $f_i$ belongs to
 $\mathcal{H}^2(\Omega_i)$, Sobolev space of functions whose first and second
 derivative are in $\mathcal{L}^2(\Omega_i)$, the functional
@@ -390,9 +392,9 @@ $\Omega_i^{\tau_i}$, union of the triangles.
 
 On the approximated domains we define Sobolev spaces,
 $\mathcal{H}^1_i\left(\Omega_i^{\tau_i}\right)$, for every $i$, and relative
-subspaces, $V^1_{i}\left(\Omega_i^{\tau_i}\right)$, \ie the finite element
-space of degree one on triangulation $\tau_i$: in this work we will limit
-ourselves to Lagrangian finite elements of degree one with nodes in the
+subspaces, $\mathcal{V}^1_{i}\left(\Omega_i^{\tau_i}\right)$, \ie the finite
+element space of degree one on triangulation $\tau_i$: in this work we will
+limit ourselves to Lagrangian finite elements of degree one with nodes in the
 vertices of the triangles.
 
 Having defined this spaces, we move to the discrete counterpart of problem
@@ -405,15 +407,16 @@ infinite dimension to finite dimension:
 	\item[--] we can write functions as linear (finite) combinations of finite
 		element basis; we denote as $\bm{\psi}_i$ or $\bm{\psi}^{\left(i\right)}$ if
 		necessary, the vector of fields that constitute a basis for
-		$V^1_{i}\left(\Omega_i^{\tau_i}\right)$;
+		$\mathcal{V}^1_{i}\left(\Omega_i^{\tau_i}\right)$;
 	\item[--] we can compute integrals by
 		numerical techniques, see \cite{quarteronitosto} for technical
 		details;
 	\item[--] thanks to previous two points, problem \ref{triple} is
 		equivalently written in algebraic form as a linear system of equations.
 \end{itemize}
-The following matrices definitions are used:\\
+The following matrices definitions are used:
 \begin{equation}
+	\label{Psi_i}
 	\Psi_i=
 	\begin{bmatrix}
 		\psi_1^{(i)}\left(\bm{p}_{i1}\right)   & \ldots & \psi_{N_{\tau_i}}^{(i)}\left(\bm{p}_{i1}\right)   \\
@@ -444,6 +447,7 @@ $i$. Define $N_{\tau}= \sum_{i=1}^{m} N_{\tau_i}$ the total number of degrees
 of freedom for all the statistical units. By defining $\tilde{\Psi}$, $\in
 	\R^{N \times N_{\tau}}$ as
 \begin{equation}
+	\label{Psitilde}
 	\tilde{\Psi}=
 	\begin{bmatrix}
 		\Psi_1 &        & 0      \\
@@ -539,6 +543,18 @@ appendix, with
 	\begin{bmatrix}
 		\left(X^TX\right)^{-1}
 	\end{bmatrix}
-	\quad V = U^T.
-\end{equation*}
+	\quad V = U^T;
+\end{equation*} again, despite $E$ being of same dimension as the monolithic system,
+it has the property of being fully sparse.
 
+This was the approach used by \citeauthor{kim} in her work \cite{kim}. The
+monolithic system, as data was coming from hundreds of units, quickly failed to
+scale at such dimension. In next section we present an iterative method that,
+under some hypothesis discussed in section \ref{assumptions}, does not require
+storing matrices such as $\tilde{R}_0$, $\tilde{R}_1$, $\tilde{\Psi}$. Despite
+this hypothesis being quite restrictive, for example the domain $\Omega_i$
+being the same across units, in many applications they can be relaxed. As an
+example, when applying this model on brain data, we will see in chapter
+\ref{ch:Applications} that different brain surfaces for each patient get
+approximated as a common standardized surface, making the iterative method
+particularly effective.

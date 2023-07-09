@@ -10,12 +10,15 @@ we consider an iterative scheme. At each step $k$ the scheme computes an
 approximate solution $(\hat{\bm{f}}^{k},\hat{\bm{g}}^{k})$ of the monolithic
 system by solving a single-unit problem for each statistical unit. After
 initializing the needed quantities, we execute iterations until we satisfy a
-stopping criterion.\\ Denote with $J^k = J_{\Omega_i, \lambda}\left(
+stopping criterion.\\ Denote with $J^k$ the functional $J_{\Omega_i, \lambda}$
+in \ref{functional}, evaluated in the estimated solution at the $k$-th
+iteration:
+\begin{equation}
+	J^k = J_{\Omega_i, \lambda}\left(
 	\hat{\bm{\beta}}^{\prime k}, \hat{\bm{b}}^{\prime k}_1, \dots,
-	\hat{\bm{b}}^{\prime k}_m, \hat{f}_1^k, \dots, \hat{f}_m^k \right)$ the
-functional $J_{\Omega_i, \lambda}$ in \ref{functional}, evaluated in the
-estimated solution at the $k$-th iteration.\\ The algorithm stops with two
-possible criteria:
+	\hat{\bm{b}}^{\prime k}_m, \hat{f}_1^k, \dots, \hat{f}_m^k \right).
+\end{equation}
+The algorithm stops with two possible criteria:
 \begin{itemize}
 	\item[--]A maximum number of iterations is reached;
 	\item[--] The following two
@@ -37,7 +40,7 @@ possible criteria:
 The details of the method that was implemented are described in the
 following sections.
 
-\subsection{The block diagonal approximation}
+\subsection{A block diagonal approximation}
 \label[subsection]{iter}
 
 Looking at the monolithic equation \ref{mono}, the question of how to formulate
@@ -51,52 +54,59 @@ following approximation is considered:
 	\label{blockdia}
 	\tilde{\Psi}^TQ\tilde{\Psi}\simeq \Gamma :=
 	\begin{bmatrix}
-		\Psi^TQ_1\Psi & 0             & \dots  & 0             \\
-		0             & \Psi^TQ_2\Psi & \ddots & \vdots        \\
-		\vdots        & \ddots        & \ddots & 0             \\
-		0             & \dots         & 0      & \Psi^TQ_m\Psi \\
+		\Psi^T_1 Q_1\Psi_1 & 0      & 0                 \\
+		0                  & \ddots & 0                 \\
+		0                  & 0      & \Psi^T_mQ_m\Psi_m \\
 	\end{bmatrix}
 	,
 \end{equation}
 where $Q_i$ indicates the $i$-th diagonal block of $Q$, of dimensions
-$n \times n$. By definition of $Q$, this is equal to
-$I_n-X_i\left(X^TX\right)^{-1}X_i^T$, with $X_i$ being the submatrix of $X$
-with coefficients $X_{jk} \ \forall j \in \{(i-1)n+1,\dots,in\},\ \forall k \in
-	\{1,\dots,q-p+mp\}$.\\ This choice is not casual but it naturally stems from
-the idea behind the iterative method as we will see in section
-\ref{iterburocratico}. Not only: $\Psi^TQ_i\Psi$ is also the $i$-th diagonal
-block of matrix $\tilde{\Psi}^TQ\tilde{\Psi}$. We will show it, for example, by
-means of Woodbury decomposition (appendix \ref{sec:wood}) as used in
-\ref{eq:wootilde}.
-
-Express $\tilde{\Psi}^TQ\tilde{\Psi}$ as
-$\tilde{\Psi}^T\tilde{\Psi}-\tilde{\Psi}^TH\tilde{\Psi}$. Thus, defining $U =
-	\tilde{\Psi}^TX$, $C = -\left(X^TX\right)^{-1}$,$V =U^T$, its $i$-th diagonal
-block is equal to $\Psi^T\Psi + U_iCV_i $, where
+$n_i \times n_i$. By definition of $Q$, this is equal to
+$I_{n_i}-X_i\left(X^TX\right)^{-1}X_i^T$, with $X_i$ being the submatrix of $X$
+with coefficients $x_{jk}$, with $j$ belonging to $\{\sum_{l=0}^{i-1}{n_l}+1,
+	\dots,\sum_{l=0}^{i}{n_l}\}$, $k$ in $\{1,\dots,q-p+mp\}$.\\ This choice
+naturally stems from the idea behind the iterative method as we will see in
+section \ref{iterburocratico}, but also $\Psi^TQ_i\Psi$ is the $i$-th diagonal
+block of matrix $\tilde{\Psi}^TQ\tilde{\Psi}$. In fact, this is equal to
+\begin{equation}
+	\tilde{\Psi}^T_iQ\tilde{\Psi}_i
+\end{equation}
+where here we have indicated with $\tilde{\Psi}^T_i$,
+$\tilde{\Psi}_i$ the $i$-th block row submatrix, \cf \ref{Psitilde} with the
+definition of $\tilde{\Psi}$. By denoting with $Q_{i,j}$ the submatrix of $Q$
+naturally arising from the subdivision per statistical unit (recall that $Q \in
+	N \times N$ with $N=\sum_{i=1}^{m}n_i$) and substituting we get
 \begin{equation}
 	\begin{split}
-		U_i = U_{jk} \ \forall j \in  \{\left(i-1\right)N_\mathcal{T}+1, \dots,
-		iN_\mathcal{T}\},\ \forall k \in \{1 \dots q-p + mp\}\\
-		= \tilde{\Psi}^T_iX =
+		\tilde{\Psi}^T_iQ\tilde{\Psi}_i=
 		\begin{bmatrix}
-			0 & \dots & 0 & \Psi^T & 0 & \dots & 0
+			0 & \dots & 0 & \Psi_i^T & 0 & \dots & 0
+		\end{bmatrix}
+		Q
+		\begin{bmatrix}
+			0      \\
+			\vdots \\
+			0      \\
+			\Psi_i \\
+			0      \\
+			\vdots \\
+			0
+		\end{bmatrix}
+		=\\
+		\begin{bmatrix}
+			\Psi^T_i Q_{i,1} & \dots \Psi^T_i Q_{i,m}
 		\end{bmatrix}
 		\begin{bmatrix}
-			X_1    \\
+			0      \\
 			\vdots \\
-			X_i    \\
+			0      \\
+			\Psi_i \\
+			0      \\
 			\vdots \\
-			X_m
+			0
 		\end{bmatrix}
-		= \Psi^T X_i,
+		= \Psi_i^T Q_i \Psi_i.
 	\end{split}
-\end{equation}
-\begin{equation}
-	V_i = U_i^T = X^T_i\Psi.
-\end{equation}
-Thus, obtaining what we wanted to prove,
-\begin{equation}
-	\Psi^T\Psi +  U_iCV_i = \Psi^T \left( I_n-X_i\left(X^TX\right)^{-1}X_i^T \right) \Psi = \Psi^T Q_i \Psi.
 \end{equation}
 
 \subsection{Initialization}
@@ -105,8 +115,8 @@ $(\hat{\bm{f}}^0,\hat{\bm{g}}^0)$ to start the algorithm from; for this
 purpose, the following $m$ problems are solved: for $i = 1, \dots, m$ solve
 \begin{equation}
 	\begin{bmatrix}
-		\Psi^TQ_i\Psi & -\lambda R_1^T \\
-		-\lambda R_1  & -\lambda R_0
+		\Psi^T_i Q_i \Psi_i & -\lambda R_1^T \\
+		-\lambda R_1        & -\lambda R_0
 	\end{bmatrix}
 	\begin{bmatrix}
 		\hat{\bm{f}}_i^0 \\
@@ -119,9 +129,8 @@ purpose, the following $m$ problems are solved: for $i = 1, \dots, m$ solve
 	\end{bmatrix}
 	,
 \end{equation}
-where $\bm{u}_i$ is the vector whose components are the first $n$
-components of $\tilde{\Psi}^T Q\bm{z}$ starting from the $n(i-1) +1$-th
-component.
+where $\bm{u}_i$ is the subvector $\left( \tilde{\Psi}^T Q\bm{z}
+	\right)_k$ such that $k=\sum_{l=1}^{l=i-1} + 1, \dots,\sum_{l=1}^{l=i}$.
 
 \subsection{Iterations}
 \label{iterburocratico}
@@ -131,10 +140,10 @@ $(\hat{\bm{f}}^k,\hat{\bm{g}}^k)$ by replacing inside the monolithic system
 \ref{mono} the unknown coefficients relative to all but one unit, with their
 value computed at previous step, for every unit.
 
-For example, the first $n$ equations of the monolithic system \ref{mono} read
+For example, the first $n_i$ equations of the monolithic system \ref{mono} read
 \begin{equation}
 	\begin{bmatrix}
-		\Psi^TQ_{1,1}\Psi & \Psi^TQ_{1,2}\Psi & \dots & \Psi^TQ_{1,m}\Psi & -\lambda R_1^T \\
+		\Psi_1^TQ_{1,1}\Psi_1 & \Psi_1^TQ_{1,2}\Psi_2 & \dots & \Psi_1^TQ_{1,m}\Psi_m & -\lambda R_1^T \\
 	\end{bmatrix}
 	\begin{bmatrix}
 		\hat{\bm{f}}_1 \\
@@ -150,13 +159,13 @@ For example, the first $n$ equations of the monolithic system \ref{mono} read
 	,
 \end{equation}
 where $Q_{i,j}$ indicates block of row $i$ and column $j$ of matrix
-$Q$. Substituting $\hat{\bm{f}}_j$ for $j \neq 1$ with $\hat{\bm{f}}_j^{k-1}$,
-taking previous step values to the right-hand side and generalizing, the
-iterative scheme reads: for $i = 1, \dots, m$ solve
+$Q$, as seen in section \ref{iter}. Substituting $\hat{\bm{f}}_j$ for $j \neq
+	1$ with $\hat{\bm{f}}_j^{k-1}$, taking previous step values to the right-hand
+side and generalizing, the iterative scheme reads: for $i = 1, \dots, m$ solve
 \begin{equation}
 	\begin{bmatrix}
-		\Psi^TQ_i\Psi & -\lambda R_1^T \\
-		-\lambda R_1  & -\lambda R_0
+		\Psi_i^TQ_i\Psi_i & -\lambda R_1^T \\
+		-\lambda R_1      & -\lambda R_0
 	\end{bmatrix}
 	\begin{bmatrix}
 		\hat{\bm{f}}_i^k \\
@@ -170,7 +179,7 @@ iterative scheme reads: for $i = 1, \dots, m$ solve
 \end{equation}
 where
 \begin{equation}
-	\bm{r}_i =\bm{u}_i -\sum_{\substack{j=1\\ j\neq i}}^m \Psi^TQ_{i,j} \Psi \hat{\bm{f}}_j^{k-1}
+	\bm{r}_i =\bm{u}_i -\sum_{\substack{j=1\\ j\neq i}}^m \Psi^T_iQ_{i,j} \Psi_j \hat{\bm{f}}_j^{k-1}
 \end{equation}
 
 An estimate of $\bm{\nu}$, $\hat{\bm{\nu}}^i = (\hat{\bm{\beta}}^{\prime i},
@@ -202,6 +211,12 @@ with the following preconditioning matrix:
 \end{equation}
 Solving a large linear system involving matrix $P$ is indeed solving
 $m$ independent linear systems of dimensions $2n\times 2n$.
+
+Notice that we have approximated $\tilde{\Psi}^TQ\tilde{\Psi}$ by keeping its
+block-diagonal pattern. On the whole monolithic system \ref{mono} though, we
+are not performing a block diagonal approximation: we are in fact keeping the
+terms outside of the main diagonal involving $\tilde{R}_1$ matrices.
+
 \section{Generalized cross validation}
 Problem \ref{mono} is solved multiple times on a grid of $\lambda s$. The best
 $\lambda$ is then chosen according to a generalized cross-validation criterion.
@@ -269,9 +284,9 @@ Several approaches are possible here for this computation.
 	      In this method we approximate $\tilde{S}$ in equation \ref{s_tilda} by
 	      considering the block diagonal approximation of the group
 	      $\tilde{\Psi}^TQ\tilde{\Psi}$. As we have seen before, its $k$-th diagonal
-	      block is $\Psi^TQ_i\Psi$. Trace of $\tilde{S}$ can therefore be written as
+	      block is $\Psi_i^TQ_i\Psi_i$. Trace of $\tilde{S}$ can therefore be written as
 	      \begin{equation}
-		      \trace \left(\tilde{S} \right) = \sum_{i=1}^{m} \left( \Psi^TQ_i\Psi  +  \lambda \tilde{R}_1^T \tilde{R}_0^{-1} \tilde{R}_1\right)^{-1}   \Psi^TQ_i\Psi .
+		      \trace \left(\tilde{S} \right) = \sum_{i=1}^{m} \left( \Psi^T_i Q_i\Psi_i  +  \lambda R_1^T R_0^{-1} R_1\right)^{-1}   \Psi_i^TQ_i\Psi_i .
 	      \end{equation}
 
 	\item[3-4.] As an estimation (possible both for method 1-2) deriving from the following result.
@@ -294,9 +309,9 @@ Several approaches are possible here for this computation.
 
 		This method allows to reduce drastically the memory necessary to compute the
 		trace of this matrix. Consider for example just the last matrix multiplication,
-		$Q_i \Psi$. The result is a dense matrix because $Q_i$ is dense and will have
-		dimensions $n \times n_{\tau}$, which could be already a large number, if the
-		mesh is fine on a manifold or a 3D domain. With previous theorem instead $\Psi
-			\bm{u}$ has length $n$, which multiplied by $Q_i$ is again a vector of length
-		$n$.
+		$Q_i \Psi_i$. The result is a dense matrix because $Q_i$ is dense and will have
+		dimensions $n_i \times n_{\tau_i}$, which could be already a large number, if
+		the mesh is fine on a manifold or a 3D domain. By using previous theorem
+		instead, $\Psi_i \bm{u}$ has length $n_i$, which multiplied by $Q_i$ is again a
+		vector of length $n_i$.
 \end{enumerate}
